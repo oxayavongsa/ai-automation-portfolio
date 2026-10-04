@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Notary All-in-One Package | Golden State Signature</title>
+<meta name="description" content="Becoming or renewing as a California notary? Golden State Signature handles your exam photo, Live Scan fingerprints, oath, starter kit, and oath & bond mailing in Sacramento." />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root { color-scheme: light; box-sizing: border-box; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', system-ui, sans-serif; background: #f9f7f4; color: #1a2e4a; line-height: 1.7; overflow-x: hidden; }
+
+  .hero { background: #1a2e4a; padding: 4rem 1.5rem 3.25rem; text-align: center; position: relative; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; top: -80px; right: -80px; width: 380px; height: 380px; border-radius: 50%; background: rgba(201,168,76,0.06); }
+  .hero-inner { max-width: 680px; margin: 0 auto; position: relative; z-index: 1; }
+  .badge { display: inline-block; background: rgba(201,168,76,0.15); border: 1px solid rgba(201,168,76,0.3); color: #c9a84c; font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; padding: 5px 16px; border-radius: 20px; margin-bottom: 1.25rem; }
+  .hero h1 { font-family: 'Cormorant Garamond', Georgia, serif; font-size: clamp(30px, 5vw, 46px); font-weight: 600; color: #fff; line-height: 1.15; margin-bottom: 1rem; }
+  .hero h1 em { color: #c9a84c; }
+  .hero p { font-size: 15.5px; color: rgba(255,255,255,0.68); max-width: 540px; margin: 0 auto; }
+  .actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .btn { font-family: inherit; font-size: 14px; font-weight: 600; padding: 12px 26px; border-radius: 8px; cursor: pointer; border: none; }
+  .btn-gold { background: #c9a84c; color: #1a2e4a; }
+  .btn-gold:hover { background: #b8943e; }
+  .btn-ghost { background: transparent; color: rgba(255,255,255,0.85); border: 1px solid rgba(255,255,255,0.25); }
+  .btn-ghost:hover { border-color: rgba(255,255,255,0.6); color: #fff; }
+
+  .status { background: #f5e9cc; border-bottom: 1px solid #e8d5a0; padding: 0.7rem 1.5rem; text-align: center; font-size: 13px; color: #7a4a0a; }
+  .status strong { color: #1a2e4a; }
+
+  .page { max-width: 900px; margin: 0 auto; padding: 3rem 1.5rem 4rem; }
+  .eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #c9a84c; margin-bottom: 6px; }
+  .title { font-family: 'Cormorant Garamond', Georgia, serif; font-size: clamp(24px, 3vw, 32px); font-weight: 600; line-height: 1.2; margin-bottom: 0.5rem; }
+  .sub { font-size: 14.5px; color: #5a6b7e; margin-bottom: 1.75rem; max-width: 600px; }
+  .divider { border: none; border-top: 1px solid #e4ddd0; margin: 3rem 0; }
+
+  /* Offer block */
+  .offer { background: #fff; border: 1px solid #e4ddd0; border-radius: 16px; padding: 0.5rem 1.5rem; display: grid; grid-template-columns: 1fr 1fr; column-gap: 2rem; }
+  .offer-row { display: flex; gap: 12px; align-items: flex-start; padding: 1rem 0; border-bottom: 1px solid #f0ede8; }
+  .offer-row:nth-last-child(-n+2) { border-bottom: none; }
+  .o-icon { width: 36px; height: 36px; border-radius: 10px; background: #1a2e4a; display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; }
+  .offer-row h3 { font-size: 14px; font-weight: 600; line-height: 1.3; margin-bottom: 2px; }
+  .offer-row p { font-size: 12.5px; color: #5a6b7e; line-height: 1.55; }
+  .note { color: #3b6d11; font-weight: 600; }
+
+  /* Tabs */
+  .tabs { display: inline-flex; background: #fff; border: 1px solid #e4ddd0; border-radius: 10px; padding: 4px; margin-bottom: 1.5rem; }
+  .tab { font-family: inherit; font-size: 13px; font-weight: 600; color: #5a6b7e; background: transparent; border: none; padding: 9px 20px; border-radius: 7px; cursor: pointer; }
+  .tab.active { background: #1a2e4a; color: #fff; }
+
+  /* Steps */
+  .steps { list-style: none; position: relative; }
+  .steps::before { content: ''; position: absolute; left: 17px; top: 8px; bottom: 8px; width: 2px; background: #e4ddd0; }
+  .step { position: relative; display: flex; gap: 16px; padding-bottom: 1.1rem; }
+  .num { width: 36px; height: 36px; border-radius: 50%; background: #fff; border: 2px solid #d0c8bc; color: #1a2e4a; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; position: relative; z-index: 1; }
+  .step.gss .num { background: #1a2e4a; border-color: #1a2e4a; color: #c9a84c; }
+  .step-body { background: #fff; border: 1px solid #e4ddd0; border-radius: 12px; padding: 0.9rem 1.1rem; flex: 1; }
+  .step.gss .step-body { border-color: #c9a84c; }
+  .step-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 3px; }
+  .step-body h4 { font-size: 14.5px; font-weight: 600; }
+  .tag { font-size: 10.5px; font-weight: 700; padding: 2px 9px; border-radius: 20px; letter-spacing: 0.02em; }
+  .tag-gss { background: #f5e9cc; color: #7a4a0a; }
+  .tag-you { background: #eef1f5; color: #5a6b7e; }
+  .step-body p { font-size: 13px; color: #5a6b7e; line-height: 1.6; }
+  .step-body a { color: #1a2e4a; font-weight: 600; text-decoration: underline; text-decoration-color: #c9a84c; text-underline-offset: 2px; }
+  .step-body a:hover { color: #7a4a0a; }
+  .panel[hidden] { display: none; }
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: #5a6b7e; margin-bottom: 1.25rem; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+
+  /* Resources */
+  .res-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .res { background: #fff; border: 1px solid #e4ddd0; border-radius: 12px; padding: 1rem 1.1rem; text-decoration: none; color: inherit; display: block; transition: border-color .2s, box-shadow .2s; }
+  .res:hover { border-color: #c9a84c; box-shadow: 0 4px 16px rgba(26,46,74,0.08); }
+  .res h4 { font-size: 13.5px; font-weight: 600; margin-bottom: 3px; }
+  .res p { font-size: 12px; color: #5a6b7e; line-height: 1.5; }
+  .res .go { font-size: 12px; font-weight: 700; color: #7a4a0a; margin-top: 6px; display: inline-block; }
+
+  .cta { background: #1a2e4a; border-radius: 16px; padding: 2.25rem 1.5rem; text-align: center; margin-top: 3rem; }
+  .cta h3 { font-family: 'Cormorant Garamond', Georgia, serif; font-size: clamp(22px, 3vw, 30px); font-weight: 600; color: #fff; margin-bottom: 0.4rem; }
+  .cta p { font-size: 14px; color: rgba(255,255,255,0.6); margin-bottom: 1.25rem; }
+  .fine { font-size: 11.5px; color: #7a8a9a; margin-top: 1.5rem; line-height: 1.6; }
+
+  @media (max-width: 640px) {
+    .offer, .res-grid { grid-template-columns: 1fr; }
+    .offer-row:nth-last-child(2) { border-bottom: 1px solid #f0ede8; }
+    .actions { flex-direction: column; align-items: center; }
+  }
+</style>
+</head>
+<body>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="badge">New &amp; Renewing California Notaries</div>
+    <h1>Notary <em>All-in-One</em> Package</h1>
+    <p>Photo, fingerprints, oath, starter kit, and filing support in one Sacramento office, plus a clear checklist so you never miss a step.</p>
+  </div>
+</section>
+
+<div class="page">
+
+  <div class="eyebrow">What we offer</div>
+  <h2 class="title">Everything we handle for you</h2>
+  <p class="sub">All in-office at 2020 Hurley Way, Ste 215, Sacramento.</p>
+
+  <div class="offer">
+    <div class="offer-row"><div class="o-icon">📷</div><div><h3>2x2 Color Exam Photo</h3><p>Meets the exam application requirement.<br><span class="note">Saturdays</span></p></div></div>
+    <div class="offer-row"><div class="o-icon">🔍</div><div><h3>Live Scan Fingerprinting</h3><p>For your Secretary of State background check.<br><span class="note">Starts November 1, 2026</span></p></div></div>
+    <div class="offer-row"><div class="o-icon">✋</div><div><h3>Oath of Office Notarized</h3><p>Sworn and notarized once your commission packet arrives.</p></div></div>
+    <div class="offer-row"><div class="o-icon">🧰</div><div><h3>Starter Kit</h3><p>Notary journal, thumbprint pad, and locking supply bag.</p></div></div>
+    <div class="offer-row"><div class="o-icon">📬</div><div><h3>Oath &amp; Bond Mailing</h3><p>We send it to the County Clerk overnight or certified, or you mail it yourself.</p></div></div>
+    <div class="offer-row"><div class="o-icon">🗺️</div><div><h3>Step-by-Step Guide</h3><p>The full checklist below, with course, bond, and stamp links.</p></div></div>
+  </div>
+
+  <hr class="divider" />
+
+  <div class="eyebrow">Your checklist</div>
+  <h2 class="title">Step by step</h2>
+  <p class="sub">Follow these in order. Gold steps are done with us.</p>
+
+  <div class="tabs" role="tablist">
+    <button class="tab active" role="tab" aria-selected="true" onclick="showTab('new', this)">New Notary</button>
+    <button class="tab" role="tab" aria-selected="false" onclick="showTab('renew', this)">Renewing Notary</button>
+  </div>
+  <div class="legend">
+    <span><i class="dot" style="background:#1a2e4a"></i> Done with Golden State Signature</span>
+    <span><i class="dot" style="background:#fff;border:2px solid #d0c8bc"></i> You complete</span>
+  </div>
+
+  <!-- NEW -->
+  <div class="panel" id="panel-new">
+    <ol class="steps">
+      <li class="step"><div class="num">1</div><div class="step-body"><div class="step-top"><h4>Take the 6-hour state-approved course</h4><span class="tag tag-you">You</span></div><p>Complete it online and save your Proof of Completion. <a href="https://notary.net/product/california-notary-online-course/?ref=32637" target="_blank" rel="noopener">Start the course →</a></p></div></li>
+      <li class="step gss"><div class="num">2</div><div class="step-body"><div class="step-top"><h4>Get your 2x2 color exam photo</h4><span class="tag tag-gss">With us</span></div><p>Attach it to your exam application. Saturdays.</p></div></li>
+      <li class="step"><div class="num">3</div><div class="step-body"><div class="step-top"><h4>Register for and take the state exam</h4><span class="tag tag-you">You</span></div><p>Bring your photo ID, completed application with photo, Proof of Completion, and the exam fee. <a href="https://notary.cpshr.us/" target="_blank" rel="noopener">Register with CPS HR →</a></p></div></li>
+      <li class="step gss"><div class="num">4</div><div class="step-body"><div class="step-top"><h4>Live Scan fingerprints</h4><span class="tag tag-gss">With us</span></div><p>After you pass, the state mails your fingerprint instructions. Bring the form to us. Must be done within one year of your exam.</p></div></li>
+      <li class="step"><div class="num">5</div><div class="step-body"><div class="step-top"><h4>Receive your commission packet</h4><span class="tag tag-you">You</span></div><p>It includes your commission and the certificate you need to order your official stamp.</p></div></li>
+      <li class="step"><div class="num">6</div><div class="step-body"><div class="step-top"><h4>Order your stamp and $15,000 bond</h4><span class="tag tag-you">You</span></div><p>The bond is required by law. Your stamp can only be made after your commission arrives. <a href="https://notaryx.com/" target="_blank" rel="noopener">Recommended supplier →</a></p></div></li>
+      <li class="step gss"><div class="num">7</div><div class="step-body"><div class="step-top"><h4>Oath of office + starter kit</h4><span class="tag tag-gss">With us</span></div><p>We administer and notarize your oath and hand you your journal, thumbprint pad, and locking bag.</p></div></li>
+      <li class="step gss"><div class="num">8</div><div class="step-body"><div class="step-top"><h4>File your oath and bond with the County Clerk</h4><span class="tag tag-gss">With us or you</span></div><p>Must be filed within 30 days of your commission start date. We mail it overnight or certified, or you mail it yourself.</p></div></li>
+      <li class="step"><div class="num">9</div><div class="step-body"><div class="step-top"><h4>Start notarizing</h4><span class="tag tag-you">You</span></div><p>Planning loan signings? Title and escrow companies require E&amp;O insurance. Ask us for a recommendation.</p></div></li>
+    </ol>
+  </div>
+
+  <!-- RENEW -->
+  <div class="panel" id="panel-renew" hidden>
+    <ol class="steps">
+      <li class="step"><div class="num">1</div><div class="step-body"><div class="step-top"><h4>Take the 3-hour refresher course</h4><span class="tag tag-you">You</span></div><p>Available if your current commission is active and you completed the 6-hour course before. Otherwise take the 6-hour course. Start early. <a href="https://notary.net/product/california-notary-online-course/?ref=32637" target="_blank" rel="noopener">Start the course →</a></p></div></li>
+      <li class="step gss"><div class="num">2</div><div class="step-body"><div class="step-top"><h4>Get a new 2x2 color exam photo</h4><span class="tag tag-gss">With us</span></div><p>Required with every application. Saturdays.</p></div></li>
+      <li class="step"><div class="num">3</div><div class="step-body"><div class="step-top"><h4>Retake the state exam</h4><span class="tag tag-you">You</span></div><p>Renewing notaries take the exam each term. <a href="https://notary.cpshr.us/" target="_blank" rel="noopener">Register with CPS HR →</a></p></div></li>
+      <li class="step gss"><div class="num">4</div><div class="step-body"><div class="step-top"><h4>New Live Scan fingerprints</h4><span class="tag tag-gss">With us</span></div><p>Required every term. Bring the form the state mails you after you pass.</p></div></li>
+      <li class="step"><div class="num">5</div><div class="step-body"><div class="step-top"><h4>Receive your new commission packet</h4><span class="tag tag-you">You</span></div><p>You'll get a new commission number and expiration date.</p></div></li>
+      <li class="step"><div class="num">6</div><div class="step-body"><div class="step-top"><h4>Order a new stamp and $15,000 bond</h4><span class="tag tag-you">You</span></div><p>Your old stamp can't be used because the commission details change. <a href="https://notaryx.com/" target="_blank" rel="noopener">Recommended supplier →</a></p></div></li>
+      <li class="step gss"><div class="num">7</div><div class="step-body"><div class="step-top"><h4>New oath of office + journal refill</h4><span class="tag tag-gss">With us</span></div><p>We notarize your oath. Starter kit included if you need fresh supplies.</p></div></li>
+      <li class="step gss"><div class="num">8</div><div class="step-body"><div class="step-top"><h4>File your oath and bond with the County Clerk</h4><span class="tag tag-gss">With us or you</span></div><p>Within 30 days of your new commission start date. We mail it overnight or certified, or you mail it yourself.</p></div></li>
+    </ol>
+  </div>
+
+  <hr class="divider" />
+
+  <div class="eyebrow">Resources</div>
+  <h2 class="title">Links you'll need</h2>
+  <div class="res-grid" style="margin-top:1.25rem;">
+    <a class="res" href="https://notary.net/product/california-notary-online-course/?ref=32637" target="_blank" rel="noopener"><h4>State-Approved Course</h4><p>6-hour new or 3-hour refresher, fully online.</p><span class="go">Start course →</span></a>
+    <a class="res" href="https://notary.cdn.sos.ca.gov/forms/notary-handbook-current.pdf" target="_blank" rel="noopener"><h4>CA Notary Handbook</h4><p>The free official guide from the Secretary of State. Study it for the exam.</p><span class="go">Open handbook →</span></a>
+    <a class="res" href="https://notaryx.com/" target="_blank" rel="noopener"><h4>Stamp, Embosser &amp; Bond</h4><p>Local Lincoln, CA supplier. Order after your commission arrives.</p><span class="go">Shop supplies →</span></a>
+  </div>
+
+  <p class="fine">Golden State Signature is not a notary education vendor or insurance agency. Course, stamp, and bond purchases are made directly with the linked providers. Requirements are set by the California Secretary of State and may change; always confirm with the current Notary Public Handbook.</p>
+</div>
+
+<script>
+  function go(url) { window.open(url, '_blank'); }
+  function showTab(which, btn) {
+    document.querySelectorAll('.tab').forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
+    btn.classList.add('active'); btn.setAttribute('aria-selected', 'true');
+    document.getElementById('panel-new').hidden = which !== 'new';
+    document.getElementById('panel-renew').hidden = which !== 'renew';
+  }
+</script>
+</body>
+</html>
