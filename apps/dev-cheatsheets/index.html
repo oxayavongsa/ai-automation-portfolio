@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dev Cheatsheets</title>
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#0b1020;
+  --panel:#16204a;
+  --panel2:#1d2a5e;
+  --head:#2b3c85;
+  --ink:#eaf0ff;
+  --muted:#9fb0e0;
+  --line:#33468f;
+  --kw:#ff7bd5;
+  --fn:#7fe0ff;
+  --str:#ffd479;
+  --num:#a0ffa8;
+  --cmt:#8fa3d8;
+  --accent:#57e2a5;
+}
+:root:not([data-theme="light"]){}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="light"]){}
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%}
+body{
+  margin:0;
+  background:
+    radial-gradient(1200px 600px at 50% -10%, #1b2a66 0%, transparent 60%),
+    var(--bg);
+  color:var(--ink);
+  font-family:ui-sans-serif,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  line-height:1.45;
+}
+.wrap{max-width:1100px;margin:0 auto;padding:18px 14px 56px}
+header.top{text-align:center;padding:10px 0 6px}
+h1{
+  margin:0;
+  font-size:clamp(26px,7vw,46px);
+  letter-spacing:.5px;
+  font-weight:800;
+  text-shadow:0 3px 0 #0a0f24;
+}
+h1 .em{filter:saturate(1.2)}
+.sub{color:var(--muted);font-size:14px;margin-top:6px}
+nav.tabs{
+  position:sticky;
+  top:env(safe-area-inset-top,0px);
+  z-index:5;
+  display:flex;gap:8px;
+  overflow-x:auto;
+  padding:12px 2px;
+  margin:10px 0 6px;
+  background:linear-gradient(180deg,var(--bg) 70%,transparent);
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+nav.tabs::-webkit-scrollbar{display:none}
+.tab{
+  flex:0 0 auto;
+  border:1px solid var(--line);
+  background:var(--panel);
+  color:var(--ink);
+  padding:9px 14px;
+  border-radius:999px;
+  font-size:14px;font-weight:600;
+  cursor:pointer;
+  white-space:nowrap;
+}
+.tab[aria-selected="true"]{background:var(--accent);color:#06231a;border-color:var(--accent)}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+  gap:14px;
+  align-items:start;
+}
+.card{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:14px;
+  overflow:hidden;
+  box-shadow:0 6px 18px rgba(0,0,0,.35);
+}
+.card h2{
+  margin:0;
+  font-size:15px;
+  padding:10px 14px;
+  background:var(--head);
+  border-bottom:1px solid var(--line);
+  letter-spacing:.3px;
+}
+pre{
+  margin:0;
+  padding:12px 14px 14px;
+  background:var(--panel2);
+  overflow-x:auto;
+  font-family:ui-monospace,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+  font-size:13px;
+  line-height:1.6;
+  tab-size:2;
+}
+.kw{color:var(--kw)} .fn{color:var(--fn)} .str{color:var(--str)}
+.num{color:var(--num)} .cmt{color:var(--cmt)}
+footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px}
+@media (max-width:420px){ .grid{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1><span class="em">⚡</span> Dev Cheatsheets</h1>
+    <div class="sub">Core syntax, side by side — tap a language</div>
+  </header>
+
+  <nav class="tabs" id="tabs" role="tablist"></nav>
+  <main class="grid" id="grid"></main>
+
+  <footer>Basics only — enough to read and write working code in any of these.</footer>
+</div>
+
+<script>
+const DATA = {
+  "Python": [
+    ["Print", "print('Hello World!')\nprint(1000)\nprint(3.14)\nprint(True)"],
+    ["Comments", "# I'm a comment!\n\nprint('Gabby')  # also a comment"],
+    ["Variables", "secret_num = 42          # int\ngravity = 9.81           # float\nusername = '@snoopdogg'  # str\nearth_is_flat = False    # bool"],
+    ["Arithmetic", "sum = 23 + 18\ndifference = 30 - 8\nproduct = 10 * 2.5\nquotient = 81 / 9\nremainder = 76 % 4\nexponent = 2 ** 3"],
+    ["User Input", "username = input('Name: ')\nage = int(input('Age: '))"],
+    ["String Interpolation", "print(f'The square of {i} is {i*i}')"],
+    ["Control Flow", "if grade >= 90:\n    print('A')\nelif grade >= 80:\n    print('B')\nelif grade >= 70:\n    print('C')\nelse:\n    print('D')"],
+    ["Relational Operators", "a == b   # equal to\na != b   # not equal to\na > b    # greater than\na < b    # less than\na >= b   # greater or equal\na <= b   # less or equal"],
+    ["Logical Operators", "a and b   # True if both are True\na or b    # True if at least one is True\nnot a     # flips True/False"],
+    ["Loops", "# While loop\nwhile coffee < 1:\n    print('Tired of Python')\n\n# For loop\nfor i in range(10):\n    print(i)"],
+    ["Random Number", "import random\n\nnum = random.randint(1, 9)"],
+    ["Lists & Dicts", "nums = [1, 2, 3]\nnums.append(4)\nnums[0]              # 1\n\nuser = {'name': 'Thai', 'age': 40}\nuser['name']         # 'Thai'"],
+    ["Functions", "def greet(name, loud=False):\n    msg = f'Hi {name}'\n    return msg.upper() if loud else msg\n\ngreet('Sam')"]
+  ],
+
+  "JavaScript": [
+    ["Print", "console.log('Hello World!');\nconsole.log(1000);\nconsole.log(3.14);\nconsole.log(true);"],
+    ["Comments", "// I'm a comment!\n\n/* I'm a\n   multi-line comment */"],
+    ["Variables", "const secretNum = 42;       // number\nlet gravity = 9.81;         // number\nconst username = '@snoop';  // string\nlet earthIsFlat = false;    // boolean"],
+    ["Arithmetic", "let sum = 23 + 18;\nlet difference = 30 - 8;\nlet product = 10 * 2.5;\nlet quotient = 81 / 9;\nlet remainder = 76 % 4;\nlet exponent = 2 ** 3;"],
+    ["User Input", "// Browser\nconst name = prompt('Name:');\nconst age = Number(prompt('Age:'));"],
+    ["String Interpolation", "console.log(`The square of ${i} is ${i*i}`);"],
+    ["Control Flow", "if (grade >= 90) {\n  console.log('A');\n} else if (grade >= 80) {\n  console.log('B');\n} else {\n  console.log('C');\n}"],
+    ["Relational Operators", "a === b  // strictly equal (use this)\na !== b  // strictly not equal\na == b   // loose equal (avoid)\na > b    // greater than\na < b    // less than\na >= b   // greater or equal"],
+    ["Logical Operators", "a && b   // true if both are true\na || b   // true if at least one is true\n!a       // flips true/false\na ?? b   // b only if a is null/undefined"],
+    ["Loops", "// While loop\nwhile (coffee < 1) {\n  console.log('Tired');\n}\n\n// For loop\nfor (let i = 0; i < 10; i++) {\n  console.log(i);\n}\n\n// For...of\nfor (const n of nums) console.log(n);"],
+    ["Random Number", "// 1 to 9 inclusive\nconst num = Math.floor(Math.random() * 9) + 1;"],
+    ["Arrays & Objects", "const nums = [1, 2, 3];\nnums.push(4);\nnums[0];             // 1\nnums.map(n => n * 2);\n\nconst user = { name: 'Thai', age: 40 };\nuser.name;           // 'Thai'"],
+    ["Functions", "function greet(name, loud = false) {\n  const msg = `Hi ${name}`;\n  return loud ? msg.toUpperCase() : msg;\n}\n\nconst add = (a, b) => a + b;"]
+  ],
+
+  "SQL": [
+    ["Select", "SELECT *\nFROM employees;\n\nSELECT first_name, hourly_rate AS rate\nFROM employees;"],
+    ["Comments", "-- I'm a comment!\n\n/* I'm a\n   multi-line comment */"],
+    ["Filtering", "SELECT *\nFROM employees\nWHERE hourly_rate > 25\n  AND active = TRUE;"],
+    ["Operators", "=        -- equal to\n<> or != -- not equal to\n>  <     -- greater / less than\n>= <=    -- greater / less or equal\nBETWEEN 10 AND 20\nIN ('CA','NV')\nLIKE 'Th%'    -- starts with Th\nIS NULL"],
+    ["Sorting & Limit", "SELECT *\nFROM employees\nORDER BY hourly_rate DESC\nLIMIT 10;"],
+    ["Aggregates", "SELECT COUNT(*)  AS headcount,\n       SUM(gross) AS total_gross,\n       AVG(gross) AS avg_gross,\n       MIN(gross), MAX(gross)\nFROM payroll;"],
+    ["Group By / Having", "SELECT department,\n       SUM(gross) AS total\nFROM payroll\nGROUP BY department\nHAVING SUM(gross) > 50000;"],
+    ["Joins", "SELECT e.name, p.gross\nFROM employees e\nJOIN payroll p ON p.emp_id = e.id;\n\n-- LEFT JOIN keeps all rows from the left table\n-- INNER JOIN keeps only matches"],
+    ["CASE (if/else)", "SELECT name,\n  CASE\n    WHEN gross >= 5000 THEN 'High'\n    WHEN gross >= 2000 THEN 'Mid'\n    ELSE 'Low'\n  END AS band\nFROM payroll;"],
+    ["Insert / Update / Delete", "INSERT INTO employees (name, rate)\nVALUES ('Sam', 28.50);\n\nUPDATE employees\nSET rate = 30.00\nWHERE id = 7;\n\nDELETE FROM employees\nWHERE id = 7;"],
+    ["Dates", "SELECT *\nFROM payroll\nWHERE pay_date >= '2026-01-01'\n  AND pay_date <  '2026-02-01';"],
+    ["Create Table", "CREATE TABLE employees (\n  id    INTEGER PRIMARY KEY,\n  name  TEXT NOT NULL,\n  rate  DECIMAL(10,2),\n  active BOOLEAN DEFAULT TRUE\n);"]
+  ],
+
+  "Java": [
+    ["Print", "System.out.println(\"Hello World!\");\nSystem.out.println(1000);\nSystem.out.print(\"no newline\");"],
+    ["Comments", "// I'm a comment!\n\n/* I'm a\n   multi-line comment */"],
+    ["Variables", "int secretNum = 42;\ndouble gravity = 9.81;\nString username = \"@snoop\";\nboolean earthIsFlat = false;\nvar count = 10;   // inferred type"],
+    ["Arithmetic", "int sum = 23 + 18;\nint difference = 30 - 8;\ndouble product = 10 * 2.5;\nint quotient = 81 / 9;    // integer division\nint remainder = 76 % 4;\ndouble exp = Math.pow(2, 3);"],
+    ["User Input", "import java.util.Scanner;\n\nScanner sc = new Scanner(System.in);\nString name = sc.nextLine();\nint age = sc.nextInt();"],
+    ["String Interpolation", "System.out.printf(\"Square of %d is %d%n\", i, i*i);\n\nString s = \"Square is \" + (i * i);"],
+    ["Control Flow", "if (grade >= 90) {\n    System.out.println(\"A\");\n} else if (grade >= 80) {\n    System.out.println(\"B\");\n} else {\n    System.out.println(\"C\");\n}"],
+    ["Relational Operators", "a == b   // equal (primitives)\na != b   // not equal\na > b    // greater than\na < b    // less than\na >= b   a <= b\ns1.equals(s2)  // compare Strings!"],
+    ["Logical Operators", "a && b   // true if both are true\na || b   // true if at least one is true\n!a       // flips true/false"],
+    ["Loops", "while (coffee < 1) {\n    System.out.println(\"Tired\");\n}\n\nfor (int i = 0; i < 10; i++) {\n    System.out.println(i);\n}\n\nfor (String n : names) {\n    System.out.println(n);\n}"],
+    ["Random Number", "import java.util.Random;\n\nRandom r = new Random();\nint num = r.nextInt(9) + 1;   // 1-9"],
+    ["Arrays & Lists", "int[] nums = {1, 2, 3};\nnums[0];   // 1\n\nList<String> names = new ArrayList<>();\nnames.add(\"Thai\");\nnames.get(0);"],
+    ["Methods & Main", "public class App {\n    static String greet(String name) {\n        return \"Hi \" + name;\n    }\n\n    public static void main(String[] args) {\n        System.out.println(greet(\"Sam\"));\n    }\n}"]
+  ],
+
+  "C++": [
+    ["Print", "#include <iostream>\nusing namespace std;\n\ncout << \"Hello World!\" << endl;\ncout << 3.14 << \"\\n\";"],
+    ["Comments", "// I'm a comment!\n\n/* I'm a\n   multi-line comment */"],
+    ["Variables", "int secretNum = 42;\ndouble gravity = 9.81;\nstring username = \"@snoop\";\nbool earthIsFlat = false;\nauto count = 10;   // inferred"],
+    ["Arithmetic", "int sum = 23 + 18;\nint difference = 30 - 8;\ndouble product = 10 * 2.5;\nint quotient = 81 / 9;   // integer division\nint remainder = 76 % 4;\ndouble e = pow(2, 3);    // <cmath>"],
+    ["User Input", "int age;\nstring name;\n\ncin >> age;\ngetline(cin, name);"],
+    ["String Interpolation", "cout << \"The square of \" << i\n     << \" is \" << i*i << endl;"],
+    ["Control Flow", "if (grade >= 90) {\n    cout << \"A\";\n} else if (grade >= 80) {\n    cout << \"B\";\n} else {\n    cout << \"C\";\n}"],
+    ["Relational Operators", "a == b   // equal to\na != b   // not equal to\na > b    // greater than\na < b    // less than\na >= b   a <= b"],
+    ["Logical Operators", "a && b   // true if both are true\na || b   // true if at least one is true\n!a       // flips true/false"],
+    ["Loops", "while (coffee < 1) {\n    cout << \"Tired\";\n}\n\nfor (int i = 0; i < 10; i++) {\n    cout << i;\n}\n\nfor (int n : nums) {\n    cout << n;\n}"],
+    ["Random Number", "#include <cstdlib>\n#include <ctime>\n\nsrand(time(0));\nint num = rand() % 9 + 1;   // 1-9"],
+    ["Vectors & Arrays", "int nums[3] = {1, 2, 3};\n\n#include <vector>\nvector<int> v = {1, 2, 3};\nv.push_back(4);\nv[0];       // 1\nv.size();"],
+    ["Functions & Main", "string greet(string name) {\n    return \"Hi \" + name;\n}\n\nint main() {\n    cout << greet(\"Sam\");\n    return 0;\n}"]
+  ],
+
+  "Bash": [
+    ["Print", "echo \"Hello World!\"\nprintf \"%s\\n\" \"Hello\"\necho -n \"no newline\""],
+    ["Comments", "# I'm a comment!\n\n: 'I am a\nmulti-line comment'"],
+    ["Variables", "secret_num=42          # no spaces around =\nusername=\"@snoop\"\nreadonly PI=3.14       # constant\necho \"$username\""],
+    ["Arithmetic", "sum=$((23 + 18))\ndifference=$((30 - 8))\nquotient=$((81 / 9))      # integer only\nremainder=$((76 % 4))\n\n# floats need bc\nproduct=$(echo \"10 * 2.5\" | bc)"],
+    ["User Input", "read -p \"Name: \" username\nread -p \"Age: \" age\nread -sp \"Password: \" pw   # hidden"],
+    ["String Interpolation", "echo \"The square of $i is $((i*i))\"\necho \"Path: ${HOME}/docs\""],
+    ["Control Flow", "if [ \"$grade\" -ge 90 ]; then\n  echo \"A\"\nelif [ \"$grade\" -ge 80 ]; then\n  echo \"B\"\nelse\n  echo \"C\"\nfi"],
+    ["Comparison Operators", "# numbers\n-eq  -ne  -gt  -lt  -ge  -le\n\n# strings\n[ \"$a\" = \"$b\" ]\n[ \"$a\" != \"$b\" ]\n[ -z \"$a\" ]   # empty\n\n# files\n[ -f file ]   # exists\n[ -d dir ]    # is directory"],
+    ["Logical Operators", "[ \"$a\" -gt 1 ] && [ \"$b\" -gt 1 ]   # and\n[ \"$a\" -gt 1 ] || [ \"$b\" -gt 1 ]   # or\n! [ -f file ]                       # not"],
+    ["Loops", "while [ \"$coffee\" -lt 1 ]; do\n  echo \"Tired\"\ndone\n\nfor i in {0..9}; do\n  echo \"$i\"\ndone\n\nfor f in *.csv; do\n  echo \"$f\"\ndone"],
+    ["Random Number", "num=$(( RANDOM % 9 + 1 ))   # 1-9"],
+    ["Arrays", "nums=(1 2 3)\nnums+=(4)\necho \"${nums[0]}\"     # 1\necho \"${nums[@]}\"     # all\necho \"${#nums[@]}\"    # length"],
+    ["Functions & Script Header", "#!/usr/bin/env bash\nset -euo pipefail\n\ngreet() {\n  local name=\"$1\"\n  echo \"Hi $name\"\n}\n\ngreet \"Sam\""]
+  ]
+};
+
+const tabsEl = document.getElementById('tabs');
+const gridEl = document.getElementById('grid');
+const langs = Object.keys(DATA);
+
+function render(lang){
+  gridEl.innerHTML = '';
+  for (const [title, code] of DATA[lang]) {
+    const card = document.createElement('section');
+    card.className = 'card';
+    const h = document.createElement('h2');
+    h.textContent = title;
+    const pre = document.createElement('pre');
+    pre.textContent = code;   // safe: no HTML parsing
+    card.appendChild(h);
+    card.appendChild(pre);
+    gridEl.appendChild(card);
+  }
+  [...tabsEl.children].forEach(b =>
+    b.setAttribute('aria-selected', String(b.textContent === lang))
+  );
+}
+
+langs.forEach(l => {
+  const b = document.createElement('button');
+  b.className = 'tab';
+  b.type = 'button';
+  b.role = 'tab';
+  b.textContent = l;
+  b.addEventListener('click', () => render(l));
+  tabsEl.appendChild(b);
+});
+
+render(langs[0]);
+</script>
+</body>
+</html>
