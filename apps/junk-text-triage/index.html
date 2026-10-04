@@ -1,0 +1,565 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found]){display:none!important}</style></head><body>
+<title>Junk Text Triage</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+  :root{
+    --bg:#F6F8F9; --panel:#FFFFFF; --panel-2:#EFF3F5;
+    --ink:#121C24; --ink-2:#55666F; --ink-3:#8496A0;
+    --line:#DCE4E8; --line-2:#C7D3D9;
+    --accent:#0B6E67; --accent-soft:#E0F0EE;
+    --scam:#A82D18; --scam-bg:#FBEAE6;
+    --promo:#8A5A06; --promo-bg:#FCF1DE;
+    --auto:#2F5D8A; --auto-bg:#E6EFF7;
+    --code:#5B4B8A; --code-bg:#EEEAF7;
+    --ok:#3A6B4C; --ok-bg:#E7F1EA;
+    --shadow:0 1px 2px rgba(18,28,36,.06), 0 8px 24px -12px rgba(18,28,36,.18);
+    --sans:"IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    --mono:"IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0D1418; --panel:#141F25; --panel-2:#1B2932;
+      --ink:#E6EEF1; --ink-2:#9DB0B9; --ink-3:#6D828C;
+      --line:#24343D; --line-2:#31454F;
+      --accent:#4FCFC0; --accent-soft:#12332F;
+      --scam:#F08A72; --scam-bg:#351914;
+      --promo:#E0AE5C; --promo-bg:#33260F;
+      --auto:#7FB3E0; --auto-bg:#142737;
+      --code:#B3A6E8; --code-bg:#221C38;
+      --ok:#7FC195; --ok-bg:#16301F;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -14px rgba(0,0,0,.7);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0D1418; --panel:#141F25; --panel-2:#1B2932;
+    --ink:#E6EEF1; --ink-2:#9DB0B9; --ink-3:#6D828C;
+    --line:#24343D; --line-2:#31454F;
+    --accent:#4FCFC0; --accent-soft:#12332F;
+    --scam:#F08A72; --scam-bg:#351914;
+    --promo:#E0AE5C; --promo-bg:#33260F;
+    --auto:#7FB3E0; --auto-bg:#142737;
+    --code:#B3A6E8; --code-bg:#221C38;
+    --ok:#7FC195; --ok-bg:#16301F;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -14px rgba(0,0,0,.7);
+  }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:var(--sans); font-size:15px; line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:900px; margin:0 auto; padding:28px 18px 72px}
+
+  /* ---- header ---- */
+  header{display:flex; flex-direction:column; gap:10px; margin-bottom:26px}
+  .eyebrow{
+    font-family:var(--mono); font-size:11px; letter-spacing:.09em; text-transform:uppercase;
+    color:var(--accent); display:inline-flex; align-items:center; gap:7px;
+  }
+  .eyebrow::before{
+    content:""; width:6px; height:6px; border-radius:50%; background:var(--accent);
+    box-shadow:0 0 0 3px var(--accent-soft);
+  }
+  h1{
+    font-size:clamp(28px,6vw,38px); line-height:1.08; margin:0;
+    font-weight:600; letter-spacing:-.02em; text-wrap:balance;
+  }
+  .lede{margin:0; color:var(--ink-2); max-width:62ch}
+
+  /* ---- panels ---- */
+  .panel{
+    background:var(--panel); border:1px solid var(--line); border-radius:10px;
+    box-shadow:var(--shadow);
+  }
+
+  /* ---- dropzone ---- */
+  .drop{
+    padding:30px 22px; text-align:center; display:flex; flex-direction:column;
+    align-items:center; gap:14px; border-style:dashed; border-width:1.5px;
+    border-color:var(--line-2); transition:border-color .15s, background .15s;
+  }
+  .drop.hot{border-color:var(--accent); background:var(--accent-soft)}
+  .drop h2{margin:0; font-size:17px; font-weight:600}
+  .drop p{margin:0; color:var(--ink-2); font-size:13.5px; max-width:46ch}
+  .btn{
+    font:inherit; font-weight:600; font-size:14.5px; cursor:pointer;
+    background:var(--accent); color:var(--bg); border:1px solid transparent;
+    padding:10px 20px; border-radius:7px; transition:filter .15s;
+  }
+  :root[data-theme="dark"] .btn, :root:not([data-theme="light"]) .btn{color:#0D1418}
+  @media (prefers-color-scheme: light){ :root:not([data-theme="dark"]) .btn{color:#FFFFFF} }
+  .btn:hover{filter:brightness(1.08)}
+  .btn:focus-visible, .chip:focus-visible, .btn-ghost:focus-visible{
+    outline:2px solid var(--accent); outline-offset:2px;
+  }
+  .btn-ghost{
+    font:inherit; font-size:13px; font-weight:500; cursor:pointer;
+    background:var(--panel-2); color:var(--ink); border:1px solid var(--line);
+    padding:7px 13px; border-radius:6px;
+  }
+  .btn-ghost:hover{border-color:var(--line-2)}
+  input[type=file]{position:absolute; width:1px; height:1px; opacity:0; pointer-events:none}
+
+  .privacy{
+    font-size:12.5px; color:var(--ink-3); display:flex; align-items:center;
+    gap:7px; justify-content:center; font-family:var(--mono);
+  }
+
+  /* ---- progress ---- */
+  #progress{display:none; padding:22px; text-align:center}
+  #progress.on{display:block}
+  .bar{height:5px; background:var(--panel-2); border-radius:3px; overflow:hidden; margin-top:12px}
+  .bar i{display:block; height:100%; width:0; background:var(--accent); transition:width .12s linear}
+  .status{font-family:var(--mono); font-size:12.5px; color:var(--ink-2)}
+
+  /* ---- stats ---- */
+  #results{display:none}
+  #results.on{display:block}
+  .stats{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+    gap:1px; background:var(--line); border:1px solid var(--line);
+    border-radius:10px; overflow:hidden; margin:26px 0;
+  }
+  .stat{background:var(--panel); padding:15px 16px}
+  .stat b{
+    display:block; font-size:26px; font-weight:600; letter-spacing:-.02em;
+    font-variant-numeric:tabular-nums; line-height:1.15;
+  }
+  .stat span{
+    display:block; font-family:var(--mono); font-size:10.5px; letter-spacing:.07em;
+    text-transform:uppercase; color:var(--ink-3); margin-top:3px;
+  }
+  .stat.flag b{color:var(--scam)}
+
+  /* ---- controls ---- */
+  .controls{display:flex; flex-wrap:wrap; gap:7px; align-items:center; margin-bottom:16px}
+  .chip{
+    font:inherit; font-size:12.5px; font-weight:500; cursor:pointer;
+    border:1px solid var(--line); background:var(--panel); color:var(--ink-2);
+    padding:6px 12px; border-radius:99px; display:inline-flex; align-items:center; gap:7px;
+  }
+  .chip:hover{border-color:var(--line-2)}
+  .chip[aria-pressed="true"]{background:var(--ink); color:var(--bg); border-color:var(--ink)}
+  .chip .n{font-family:var(--mono); font-size:11px; opacity:.7}
+  .dot{width:7px; height:7px; border-radius:2px}
+
+  /* ---- sender list ---- */
+  .list{display:flex; flex-direction:column; gap:9px}
+  .row{
+    background:var(--panel); border:1px solid var(--line); border-radius:9px;
+    padding:13px 15px; display:grid; gap:9px;
+    grid-template-columns:1fr auto; align-items:start;
+    border-left:3px solid var(--line-2);
+  }
+  .row.sev-scam{border-left-color:var(--scam)}
+  .row.sev-promo{border-left-color:var(--promo)}
+  .row.sev-auto{border-left-color:var(--auto)}
+  .row.sev-code{border-left-color:var(--code)}
+  .row.sev-ok{border-left-color:var(--ok)}
+  .num{
+    font-family:var(--mono); font-size:15px; font-weight:500;
+    letter-spacing:-.01em; word-break:break-all;
+  }
+  .who{font-size:12.5px; color:var(--ink-3); margin-top:1px}
+  .count{text-align:right; font-family:var(--mono); font-variant-numeric:tabular-nums}
+  .count b{display:block; font-size:19px; font-weight:600; line-height:1.1}
+  .count span{font-size:10px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-3)}
+  .meta{grid-column:1/-1; display:flex; flex-wrap:wrap; gap:6px; align-items:center}
+  .tag{
+    font-family:var(--mono); font-size:10.5px; letter-spacing:.05em; text-transform:uppercase;
+    padding:3px 8px; border-radius:4px; font-weight:500;
+  }
+  .t-scam{background:var(--scam-bg); color:var(--scam)}
+  .t-promo{background:var(--promo-bg); color:var(--promo)}
+  .t-auto{background:var(--auto-bg); color:var(--auto)}
+  .t-code{background:var(--code-bg); color:var(--code)}
+  .t-ok{background:var(--ok-bg); color:var(--ok)}
+  .t-plain{background:var(--panel-2); color:var(--ink-3)}
+  .action{
+    grid-column:1/-1; font-size:13px; color:var(--ink-2);
+    padding-top:8px; border-top:1px solid var(--line);
+  }
+  .action b{color:var(--ink); font-weight:600}
+  .sample{
+    grid-column:1/-1; font-size:12.5px; color:var(--ink-3); font-style:italic;
+    overflow:hidden; text-overflow:ellipsis; display:-webkit-box;
+    -webkit-line-clamp:2; -webkit-box-orient:vertical; line-clamp:2;
+  }
+
+  .sectitle{
+    font-family:var(--mono); font-size:11px; letter-spacing:.09em; text-transform:uppercase;
+    color:var(--ink-3); margin:30px 0 12px; display:flex; align-items:center; gap:10px;
+  }
+  .sectitle::after{content:""; flex:1; height:1px; background:var(--line)}
+
+  .empty{padding:30px; text-align:center; color:var(--ink-3); font-size:14px}
+  footer{
+    margin-top:40px; padding-top:18px; border-top:1px solid var(--line);
+    font-size:12.5px; color:var(--ink-3);
+  }
+  .err{
+    background:var(--scam-bg); color:var(--scam); border:1px solid var(--scam);
+    padding:13px 15px; border-radius:8px; font-size:13.5px; margin-top:16px; display:none;
+  }
+  .err.on{display:block}
+  @media (prefers-reduced-motion: reduce){ *{transition:none !important; animation:none !important} }
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">Runs on your phone · nothing is uploaded</span>
+    <h1>Junk Text Triage</h1>
+    <p class="lede">Open your SMS&nbsp;Backup&nbsp;&amp;&nbsp;Restore file below. It's read inside this browser tab and never leaves your device. You'll get every junk sender ranked by volume, sorted into who to block, who to unsubscribe from, and who never to reply to.</p>
+  </header>
+
+  <div class="panel drop" id="drop">
+    <h2>Choose your backup file</h2>
+    <p>The <code>sms-…&#8203;.xml</code> file from SMS Backup &amp; Restore. A renamed <code>.txt</code> copy works too.</p>
+    <button class="btn" id="pick" type="button">Choose file</button>
+    <input type="file" id="file" accept=".xml,.txt,text/xml,text/plain">
+    <span class="privacy">no upload · no network · no storage</span>
+  </div>
+
+  <div class="err" id="err"></div>
+
+  <div class="panel" id="progress">
+    <div class="status" id="status">Reading file…</div>
+    <div class="bar"><i id="barfill"></i></div>
+  </div>
+
+  <div id="results">
+    <div class="stats" id="stats"></div>
+    <div class="controls" id="controls"></div>
+    <div class="list" id="list"></div>
+    <footer id="foot"></footer>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var CATS = {
+    scam:  {label:"Scam / phishing", cls:"scam",  sev:0, color:"var(--scam)",
+            action:"<b>Block, never reply.</b> Replying — even STOP — confirms your number is live and gets it resold. Open the thread → ⋮ → Block &amp; report spam."},
+    promo: {label:"Marketing", cls:"promo", sev:1, color:"var(--promo)",
+            action:"<b>Opt out — this one is legitimate.</b> Use the Unsubscribe button at the bottom of the thread, or reply STOP. Registered senders are legally required to honor it."},
+    auto:  {label:"Automated / alerts", cls:"auto", sev:2, color:"var(--auto)",
+            action:"<b>Decide if you still want these.</b> Shortcode alerts from services you signed up for. Reply STOP if not, otherwise leave them."},
+    code:  {label:"Verification codes", cls:"code", sev:3, color:"var(--code)",
+            action:"<b>Safe to clear out.</b> One-time passcodes with no value after use. Turn on Messages → Settings → Message organization → auto-delete OTPs."},
+    ok:    {label:"Real conversation", cls:"ok",   sev:4, color:"var(--ok)",
+            action:"<b>Leave alone.</b> You've replied to this sender, or they're in your contacts."}
+  };
+
+  var RX_SCAM = /(claim (your|this)|you (have )?won|congratulations you|gift ?card|bitcoin|crypto|\binvest(ment|ing)?\b|wire transfer|unpaid toll|toll (bill|charge)|customs (fee|duty)|delivery (fee|attempt) fail|package (is )?(held|pending|undeliver)|usps|fedex.*(fee|redeliver)|account (has been )?(suspend|lock|restrict)|verify your (account|identity|information)|unusual (sign|activity)|irs\b|social security number|arrest warrant|legal action|final notice|act now|limited time offer|click (the |this )?link|bit\.ly|tinyurl|goo\.gl|t\.co\/|cutt\.ly|hi dear|how are you (doing|today)|is this still your number|sorry to bother|i got your (contact|number) from)/i;
+  var RX_OPTOUT = /(reply stop|text stop|txt stop|stop to (opt ?out|end|cancel|unsubscribe)|unsubscribe|opt ?out|stop2end|stop=end|\bstop\b to quit)/i;
+  var RX_CODE = /(verification code|security code|one[- ]time (code|passcode|password)|\botp\b|your (code|pin) is|access code|login code|do not share (this|your) code|is your .{0,20}code|passcode)/i;
+  var RX_LINK = /(https?:\/\/|www\.|\b[a-z0-9-]+\.(com|net|org|co|io|info|xyz|top|shop|link|click|live|vip)\b)/i;
+  var TOLLFREE = /^1?(800|833|844|855|866|877|888)/;
+
+  var ENT = {"&amp;":"&","&lt;":"<","&gt;":">","&quot;":'"',"&apos;":"'","&#10;":"\n","&#13;":"","&#9;":"\t"};
+  function decode(s){
+    if(s.indexOf("&") === -1) return s;
+    return s.replace(/&(?:amp|lt|gt|quot|apos|#10|#13|#9);/g, function(m){ return ENT[m]; })
+            .replace(/&#(\d+);/g, function(_,d){ try{ return String.fromCharCode(+d); }catch(e){ return ""; } });
+  }
+
+  function normAddr(a){
+    if(!a) return "";
+    var t = String(a).trim();
+    if(/[a-zA-Z]/.test(t)) return t;              // alphanumeric sender ID
+    var d = t.replace(/[^\d]/g,"");
+    if(d.length === 11 && d.charAt(0) === "1") d = d.slice(1);
+    return d;
+  }
+  function prettyAddr(a){
+    if(/[a-zA-Z]/.test(a)) return a;
+    if(a.length === 10) return "(" + a.slice(0,3) + ") " + a.slice(3,6) + "-" + a.slice(6);
+    return a;
+  }
+  function fmt(n){ return n.toLocaleString(); }
+  function dstr(ms){
+    if(!ms) return "—";
+    var d = new Date(ms);
+    if(isNaN(d)) return "—";
+    return d.toLocaleDateString(undefined,{year:"numeric",month:"short",day:"numeric"});
+  }
+
+  var $ = function(id){ return document.getElementById(id); };
+  var drop = $("drop"), fileInput = $("file"), prog = $("progress"), bar = $("barfill"),
+      status = $("status"), results = $("results"), errBox = $("err");
+
+  $("pick").addEventListener("click", function(){ fileInput.click(); });
+  fileInput.addEventListener("change", function(e){
+    if(e.target.files && e.target.files[0]) load(e.target.files[0]);
+  });
+  ["dragenter","dragover"].forEach(function(t){
+    drop.addEventListener(t, function(e){ e.preventDefault(); drop.classList.add("hot"); });
+  });
+  ["dragleave","drop"].forEach(function(t){
+    drop.addEventListener(t, function(e){ e.preventDefault(); drop.classList.remove("hot"); });
+  });
+  drop.addEventListener("drop", function(e){
+    if(e.dataTransfer.files && e.dataTransfer.files[0]) load(e.dataTransfer.files[0]);
+  });
+
+  function fail(msg){
+    errBox.textContent = msg;
+    errBox.classList.add("on");
+    prog.classList.remove("on");
+  }
+
+  function load(file){
+    errBox.classList.remove("on");
+    results.classList.remove("on");
+    prog.classList.add("on");
+    status.textContent = "Reading " + (file.size/1048576).toFixed(1) + " MB…";
+    bar.style.width = "3%";
+
+    var reader = new FileReader();
+    reader.onerror = function(){ fail("Couldn't read that file. Try copying it somewhere local first, then pick it again."); };
+    reader.onload = function(){ parse(String(reader.result)); };
+    reader.readAsText(file);
+  }
+
+  // Matches a full <sms .../> element, tolerating ">" inside quoted attribute values.
+  var RX_SMS = /<sms\b((?:[^"]|"[^"]*")*?)\/>/g;
+  var RX_MMS = /<mms\b((?:[^"]|"[^"]*")*?)>/g;
+  var RX_ATTR = /([\w-]+)="([^"]*)"/g;
+
+  function attrs(chunk){
+    var o = {}, m;
+    RX_ATTR.lastIndex = 0;
+    while((m = RX_ATTR.exec(chunk)) !== null) o[m[1]] = m[2];
+    return o;
+  }
+
+  function parse(text){
+    if(!/<sms\b|<mms\b/.test(text)){
+      fail("That doesn't look like an SMS Backup & Restore file — no message records found. Make sure you picked the sms-… file, not the calls-… one.");
+      return;
+    }
+
+    var senders = Object.create(null);
+    var totals = {sms:0, mms:0};
+    RX_SMS.lastIndex = 0;
+    RX_MMS.lastIndex = 0;
+
+    function bump(addr, inbound, body, when, name){
+      var key = normAddr(addr);
+      if(!key) return;
+      var s = senders[key];
+      if(!s){
+        s = senders[key] = {addr:key, inb:0, out:0, last:0, first:Infinity,
+                            name:"", sample:"", optout:false, code:false,
+                            scam:false, link:false};
+      }
+      if(name && name !== "(Unknown)" && name !== "null" && !s.name) s.name = name;
+      if(inbound){
+        s.inb++;
+        if(body){
+          if(!s.sample) s.sample = body.slice(0,160);
+          if(RX_OPTOUT.test(body)) s.optout = true;
+          if(RX_CODE.test(body))   s.code   = true;
+          if(RX_SCAM.test(body))   s.scam   = true;
+          if(RX_LINK.test(body))   s.link   = true;
+        }
+      } else s.out++;
+      if(when){
+        if(when > s.last) s.last = when;
+        if(when < s.first) s.first = when;
+      }
+    }
+
+    var startedAt = Date.now();
+
+    function runSms(done){
+      var n = 0, m;
+      while((m = RX_SMS.exec(text)) !== null){
+        var a = attrs(m[1]);
+        totals.sms++;
+        bump(a.address, a.type === "1", a.body ? decode(a.body) : "", +a.date || 0, a.contact_name || "");
+        if(++n >= 4000){
+          bar.style.width = Math.min(75, 5 + (RX_SMS.lastIndex / text.length) * 70) + "%";
+          status.textContent = "Reading messages… " + fmt(totals.sms);
+          setTimeout(function(){ runSms(done); }, 0);
+          return;
+        }
+      }
+      done();
+    }
+
+    function runMms(done){
+      var n = 0, m;
+      while((m = RX_MMS.exec(text)) !== null){
+        var a = attrs(m[1]);
+        if(!a.address) continue;
+        totals.mms++;
+        bump(a.address, a.msg_box === "1", "", +a.date || 0, a.contact_name || "");
+        if(++n >= 4000){
+          bar.style.width = Math.min(92, 78 + (RX_MMS.lastIndex / text.length) * 14) + "%";
+          setTimeout(function(){ runMms(done); }, 0);
+          return;
+        }
+      }
+      done();
+    }
+
+    status.textContent = "Reading messages…";
+    runSms(function(){
+      status.textContent = "Checking picture messages…";
+      runMms(function(){
+        bar.style.width = "97%";
+        status.textContent = "Sorting senders…";
+        setTimeout(function(){
+          render(senders, totals, Date.now() - startedAt);
+        }, 30);
+      });
+    });
+  }
+
+  function classify(s){
+    var known   = !!s.name;
+    var replied = s.out > 0;
+    var digits  = /^\d+$/.test(s.addr);
+    var shortc  = digits && s.addr.length <= 6;
+
+    if(known || replied) return "ok";
+    if(s.scam) return "scam";
+    if(s.code) return "code";
+    if(s.optout) return "promo";
+    if(shortc) return "auto";
+    // Unknown 10-digit number, never answered, sending links: treat as scam.
+    if(digits && s.addr.length >= 10 && s.link) return "scam";
+    if(digits && TOLLFREE.test(s.addr)) return "promo";
+    return "auto";
+  }
+
+  var state = {rows:[], filter:"all"};
+
+  function render(senders, totals, ms){
+    var rows = [];
+    for(var k in senders){
+      var s = senders[k];
+      if(s.inb === 0) continue;               // only senders who texted you
+      s.cat = classify(s);
+      rows.push(s);
+    }
+
+    rows.sort(function(a,b){
+      var d = CATS[a.cat].sev - CATS[b.cat].sev;
+      if(d !== 0) return d;
+      return b.inb - a.inb;
+    });
+
+    state.rows = rows;
+
+    var counts = {all:0, scam:0, promo:0, auto:0, code:0, ok:0};
+    var msgs   = {scam:0, promo:0, auto:0, code:0, ok:0};
+    rows.forEach(function(r){ counts.all++; counts[r.cat]++; msgs[r.cat] += r.inb; });
+
+    var junkSenders = counts.scam + counts.promo + counts.auto + counts.code;
+    var junkMsgs    = msgs.scam + msgs.promo + msgs.auto + msgs.code;
+    var total       = totals.sms + totals.mms;
+
+    $("stats").innerHTML =
+      stat(fmt(total), "messages read") +
+      stat(fmt(counts.all), "senders") +
+      stat(fmt(junkSenders), "junk senders", true) +
+      stat(total ? Math.round(junkMsgs / total * 100) + "%" : "0%", "of your inbox is junk", true);
+
+    var order = ["scam","promo","auto","code","ok"];
+    var html = '<button class="chip" type="button" data-f="all" aria-pressed="true">All senders <span class="n">' + counts.all + '</span></button>';
+    order.forEach(function(c){
+      if(!counts[c]) return;
+      html += '<button class="chip" type="button" data-f="' + c + '" aria-pressed="false">' +
+              '<span class="dot" style="background:' + CATS[c].color + '"></span>' +
+              CATS[c].label + ' <span class="n">' + counts[c] + '</span></button>';
+    });
+    if(counts.scam){
+      html += '<button class="btn-ghost" type="button" id="copyblock" style="margin-left:auto">Copy block list</button>';
+    }
+    $("controls").innerHTML = html;
+
+    Array.prototype.forEach.call($("controls").querySelectorAll(".chip"), function(btn){
+      btn.addEventListener("click", function(){
+        state.filter = btn.getAttribute("data-f");
+        Array.prototype.forEach.call($("controls").querySelectorAll(".chip"), function(b){
+          b.setAttribute("aria-pressed", String(b === btn));
+        });
+        paint();
+      });
+    });
+    var cb = $("copyblock");
+    if(cb) cb.addEventListener("click", function(){
+      var nums = state.rows.filter(function(r){ return r.cat === "scam"; })
+                           .map(function(r){ return prettyAddr(r.addr); }).join("\n");
+      if(navigator.clipboard){
+        navigator.clipboard.writeText(nums).then(function(){
+          cb.textContent = "Copied " + counts.scam + " numbers";
+          setTimeout(function(){ cb.textContent = "Copy block list"; }, 2200);
+        }, function(){ cb.textContent = "Couldn't copy"; });
+      }
+    });
+
+    $("foot").innerHTML =
+      "Parsed " + fmt(total) + " messages in " + (ms/1000).toFixed(1) + "s, entirely inside this browser tab. " +
+      "Nothing was uploaded, sent, or saved anywhere. Close the tab and it's gone. " +
+      "Senders you've replied to, or who are in your contacts, are marked <em>Real conversation</em> and left out of the junk counts.";
+
+    paint();
+    prog.classList.remove("on");
+    results.classList.add("on");
+    results.scrollIntoView({behavior:"smooth", block:"start"});
+  }
+
+  function stat(v, label, flag){
+    return '<div class="stat' + (flag ? " flag" : "") + '"><b>' + v + '</b><span>' + label + '</span></div>';
+  }
+
+  function esc(s){
+    return String(s).replace(/[&<>"]/g, function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];
+    });
+  }
+
+  function paint(){
+    var f = state.filter;
+    var rows = state.rows.filter(function(r){ return f === "all" || r.cat === f; });
+    var shown = rows.slice(0, 300);
+
+    if(!shown.length){
+      $("list").innerHTML = '<div class="panel empty">Nothing in this category.</div>';
+      return;
+    }
+
+    var out = shown.map(function(r){
+      var c = CATS[r.cat];
+      var h = '<div class="row sev-' + c.cls + '">';
+      h += '<div><div class="num">' + esc(prettyAddr(r.addr)) + '</div>';
+      h += '<div class="who">' + (r.name ? esc(r.name) : (r.addr.length <= 6 ? "shortcode" : "not in contacts")) + '</div></div>';
+      h += '<div class="count"><b>' + fmt(r.inb) + '</b><span>received</span></div>';
+      h += '<div class="meta"><span class="tag t-' + c.cls + '">' + esc(c.label) + '</span>';
+      h += '<span class="tag t-plain">last ' + dstr(r.last) + '</span>';
+      if(r.out) h += '<span class="tag t-plain">you sent ' + fmt(r.out) + '</span>';
+      if(r.link && r.cat === "scam") h += '<span class="tag t-plain">contains links</span>';
+      h += '</div>';
+      if(r.sample) h += '<div class="sample">“' + esc(r.sample) + '”</div>';
+      h += '<div class="action">' + c.action + '</div>';
+      h += '</div>';
+      return h;
+    }).join("");
+
+    if(rows.length > shown.length){
+      out += '<div class="panel empty">Showing the top 300 of ' + fmt(rows.length) + ' senders. The rest are long-tail one-offs not worth your time.</div>';
+    }
+    $("list").innerHTML = out;
+  }
+})();
+</script>
+
+</body></html>
