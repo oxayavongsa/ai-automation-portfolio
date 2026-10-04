@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Aorta Guard: Cardiovascular Risk MLOps Pipeline</title>
+<meta name="description" content="End-to-end AWS SageMaker pipeline for cardiovascular disease prediction: Athena ingestion, Feature Store, CI/CD, batch inference, and Model Monitor with CloudWatch.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Aorta Guard: Cardiovascular Risk MLOps Pipeline on AWS SageMaker">
+<meta property="og:description" content="End-to-end AWS SageMaker pipeline for cardiovascular disease prediction: Athena ingestion, Feature Store, CI/CD, batch inference, and Model Monitor with CloudWatch.">
+<meta property="og:url" content="https://oxayavongsa.github.io/ai-automation-portfolio/projects/aorta-guard/">
+<meta property="og:image" content="https://oxayavongsa.github.io/ai-automation-portfolio/projects/aorta-guard/preview.png">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="627">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://oxayavongsa.github.io/ai-automation-portfolio/projects/aorta-guard/preview.png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0f17;--card:#121a26;--line:#223047;--ink:#e9eef6;--mute:#93a3ba;--acc:#5eead4;--acc2:#a78bfa}
+@media (prefers-color-scheme:light){:root{--bg:#f6f8fb;--card:#fff;--line:#dfe5ee;--ink:#0f1722;--mute:#5a6a80;--acc:#0d9488;--acc2:#7c3aed}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Inter,system-ui,sans-serif}
+.wrap{max-width:820px;margin:0 auto;padding:48px 16px 72px}
+.k{font:500 12px "JetBrains Mono",monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--acc)}
+h1{font-size:clamp(30px,6vw,46px);line-height:1.08;margin:10px 0 12px;letter-spacing:-.02em}
+.lede{color:var(--mute);margin:0 0 20px}
+img.hero{width:100%;border-radius:14px;border:1px solid var(--line);display:block;margin:0 0 24px}
+ul{padding-left:20px}li{margin:6px 0}
+.pills{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 26px}.pills span{border:1px solid var(--line);border-radius:99px;padding:4px 12px;font-size:13px;color:var(--mute)}
+.btn{display:inline-block;background:var(--acc);color:#0b0f17;font-weight:600;padding:10px 18px;border-radius:10px;text-decoration:none;margin:0 10px 10px 0}
+.btn.ghost{background:transparent;color:var(--acc);border:1px solid var(--line)}
+a.back{color:var(--mute);font-size:14px;text-decoration:none}
+</style></head><body><main class="wrap">
+<a class="back" href="https://oxayavongsa.github.io/ai-automation-portfolio/">← All projects</a>
+<p class="k">MLOps · AWS SageMaker</p><h1>Aorta Guard: Cardiovascular Risk MLOps Pipeline</h1><p class="lede">A model is only half the job. Aorta Guard flags at-risk patients from routine clinical and lifestyle measurements, and it also covers the production work around the model: versioned features, automated training and deployment, batch scoring, and drift and infrastructure monitoring.</p>
+<img class="hero" src="preview.png" alt="Aorta Guard: Cardiovascular Risk MLOps Pipeline on AWS SageMaker" width="1200" height="627">
+<ul><li><b>Final model:</b> a tuned Random Forest with <b>ROC AUC 0.795</b> and 0.73 accuracy on a held-out test set.</li><li><b>Data:</b> 70,000 patient records, engineered into 24 features. 40% of the data is held back as a production reserve that feeds inference and monitoring.</li><li><b>Pipeline:</b> S3 → Athena → SageMaker Feature Store → training → CI/CD scripts → Batch Transform and real-time endpoints.</li><li><b>Monitoring:</b> Model Monitor baselines plus CloudWatch dashboards and alarms for 4XX/5XX errors, CPU and memory.</li><li><b>Top predictors:</b> systolic blood pressure, cholesterol-to-BMI ratio, and BMI.</li></ul><div class="pills"><span>AWS SageMaker</span><span>Feature Store</span><span>Model Monitor</span><span>CloudWatch</span><span>Athena</span><span>scikit-learn</span><span>Python</span></div><a class="btn" href="https://github.com/oxayavongsa/mlops-cardiovascular-pipeline">View code on GitHub →</a><a class="btn ghost" href="https://youtu.be/TadOY47Osu8">Watch the demo</a>
+</main></body></html>
