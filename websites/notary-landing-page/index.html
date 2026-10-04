@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Mobile Notary in Sacramento | Golden State Signature</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root { color-scheme: light; box-sizing: border-box; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; background: #f9f7f4; color: #1a2e4a; line-height: 1.7; overflow-x: hidden; }
+
+  /* ── Hero ── */
+  .hero { background: #1a2e4a; padding: 5rem 2rem 4rem; text-align: center; position: relative; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; top: -80px; right: -80px; width: 400px; height: 400px; border-radius: 50%; background: rgba(201,168,76,0.06); }
+  .hero::after { content: ''; position: absolute; bottom: -100px; left: -60px; width: 350px; height: 350px; border-radius: 50%; background: rgba(201,168,76,0.04); }
+  .hero-inner { max-width: 700px; margin: 0 auto; position: relative; z-index: 1; }
+  .hero-badge { display: inline-block; background: rgba(201,168,76,0.15); border: 1px solid rgba(201,168,76,0.3); color: #c9a84c; font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; padding: 5px 18px; border-radius: 20px; margin-bottom: 1.5rem; }
+  .hero h1 { font-family: 'Cormorant Garamond', serif; font-size: clamp(32px, 5vw, 52px); font-weight: 600; color: #fff; line-height: 1.15; margin-bottom: 1.25rem; }
+  .hero h1 em { color: #c9a84c; font-style: italic; }
+  .hero p { font-size: 16px; color: rgba(255,255,255,0.65); max-width: 520px; margin: 0 auto 2rem; line-height: 1.8; }
+  .hero-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn-primary { background: #c9a84c; color: #1a2e4a; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; padding: 13px 32px; border-radius: 8px; border: none; cursor: pointer; text-decoration: none; letter-spacing: 0.02em; }
+  .btn-primary:hover { background: #b8943e; }
+  .btn-secondary { background: transparent; color: rgba(255,255,255,0.8); font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500; padding: 13px 32px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); cursor: pointer; text-decoration: none; }
+  .btn-secondary:hover { border-color: rgba(255,255,255,0.5); color: #fff; }
+
+  /* ── Ticker bar ── */
+  .ticker-wrap { width: 100%; background: linear-gradient(135deg, #1a2e4a, #243d5e); border-top: 1px solid rgba(201,168,76,0.25); border-bottom: 1px solid rgba(201,168,76,0.25); overflow: hidden; position: relative; height: 46px; }
+  .ticker-wrap::before, .ticker-wrap::after { content: ''; position: absolute; top: 0; width: 60px; height: 100%; z-index: 2; pointer-events: none; }
+  .ticker-wrap::before { left: 0; background: linear-gradient(to right, #1a2e4a, transparent); }
+  .ticker-wrap::after { right: 0; background: linear-gradient(to left, #1a2e4a, transparent); }
+  .ticker-track { display: flex; flex-direction: row; flex-wrap: nowrap; width: max-content; min-width: 200%; height: 46px; align-items: center; animation: ticker-scroll 40s linear infinite; }
+  .ticker-track:hover { animation-play-state: paused; }
+  @keyframes ticker-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+  .ticker-item { display: inline-flex; flex-shrink: 0; align-items: center; gap: 8px; padding: 0 24px; white-space: nowrap; border-right: 1px solid rgba(201,168,76,0.15); height: 46px; }
+  .ticker-icon { font-size: 14px; flex-shrink: 0; }
+  .ticker-text { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.82); letter-spacing: 0.02em; white-space: nowrap; }
+  .ticker-text span { color: #c9a84c; }
+
+  /* ── Page ── */
+  .page { max-width: 900px; margin: 0 auto; padding: 3.5rem 1.5rem 4rem; }
+  .section-eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #c9a84c; margin-bottom: 6px; }
+  .section-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(24px, 3vw, 32px); font-weight: 600; color: #1a2e4a; margin-bottom: 0.5rem; line-height: 1.2; }
+  .section-sub { font-size: 15px; color: #5a6b7e; margin-bottom: 2rem; max-width: 580px; line-height: 1.75; }
+  .divider { border: none; border-top: 1px solid #e4ddd0; margin: 3rem 0; }
+  .tier-label { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 1rem; }
+  .tier-now { color: #3b6d11; }
+  .tier-sept { color: #7a4a0a; }
+  .tier-feb { color: #1a2e4a; }
+
+  /* ── Service cards ── */
+  .services-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; margin-bottom: 2rem; }
+  .service-card { background: #fff; border: 1px solid #e4ddd0; border-radius: 16px; padding: 1.5rem; transition: box-shadow 0.2s; }
+  .service-card:hover { box-shadow: 0 4px 20px rgba(26,46,74,0.08); }
+  .service-card.coming { background: #f9f7f4; border: 1px dashed #d0c8bc; }
+  .service-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 12px; }
+  .icon-navy { background: #1a2e4a; }
+  .icon-muted { background: #f0ede8; }
+  .service-card h3 { font-size: 15px; font-weight: 600; color: #1a2e4a; margin-bottom: 6px; line-height: 1.3; }
+  .service-card p { font-size: 13px; color: #5a6b7e; line-height: 1.65; margin-bottom: 10px; }
+  .service-tag { display: inline-block; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+  .tag-available { background: #eaf3de; color: #3b6d11; }
+  .tag-sept { background: #faeeda; color: #7a4a0a; }
+  .tag-feb { background: #e8eef5; color: #1a2e4a; }
+
+  /* ── Available-now block ── */
+  .now-block { background: #fff; border: 1px solid #e4ddd0; border-radius: 16px; padding: 0.5rem 1.5rem; margin-bottom: 2rem; display: grid; grid-template-columns: 1fr 1fr; column-gap: 2rem; }
+  .now-row { display: flex; gap: 12px; align-items: flex-start; padding: 1rem 0; border-bottom: 1px solid #f0ede8; }
+  .now-row:nth-last-child(-n+2) { border-bottom: none; }
+  .now-icon { width: 36px; height: 36px; border-radius: 10px; background: #1a2e4a; display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; }
+  .now-row h3 { font-size: 14px; font-weight: 600; color: #1a2e4a; line-height: 1.3; margin-bottom: 2px; }
+  .now-row p { font-size: 12.5px; color: #5a6b7e; line-height: 1.55; }
+  .now-row .now-note { color: #3b6d11; font-weight: 600; }
+  .who-list { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+  .who-chip { font-size: 11px; font-weight: 500; color: #4a5b6d; background: #f0ede8; padding: 3px 9px; border-radius: 20px; }
+  .info-sub { font-size: 13px; font-weight: 600; color: #1a2e4a; margin: 1.5rem 0 0.75rem; }
+  .info-card a { color: #7a4a0a; font-weight: 600; }
+
+  .pkg-head { font-size: 11px !important; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #7a4a0a !important; margin: 10px 0 4px !important; }
+  .pkg-list { list-style: none; margin: 0 0 4px; padding: 0; }
+  .pkg-list li { font-size: 12.5px; color: #5a6b7e; line-height: 1.5; padding: 2px 0 2px 16px; position: relative; }
+  .pkg-list li::before { content: '✓'; position: absolute; left: 0; color: #c9a84c; font-weight: 700; }
+
+  .nov-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 16px; margin-bottom: 16px; }
+  .pkg-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px; }
+  .partner-bar { background: #fff; border: 1px solid #c9a84c; border-radius: 16px; padding: 1rem 1.4rem; display: flex; align-items: center; gap: 14px; margin-bottom: 2rem; }
+  .partner-icon { width: 40px; height: 40px; border-radius: 10px; background: #1a2e4a; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .partner-text { flex: 1; }
+  .partner-text p { font-size: 13px; color: #5a6b7e; line-height: 1.55; margin: 0; }
+  .partner-text strong { color: #1a2e4a; }
+  .btn-partner { background: #c9a84c; color: #1a2e4a; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 700; padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; white-space: nowrap; }
+  .btn-partner:hover { background: #b8943e; }
+
+  .pkg-link { color: #1a2e4a; font-weight: 600; text-decoration: underline; text-decoration-color: #c9a84c; text-underline-offset: 2px; }
+  .pkg-link:hover { color: #7a4a0a; }
+  .pkg-more { display: inline-block; margin-top: 12px; font-size: 13px; font-weight: 700; color: #7a4a0a; text-decoration: none; }
+  .pkg-more:hover { text-decoration: underline; }
+
+  /* ── Pricing ── */
+  .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 1.25rem; }
+  .pricing-card { background: #fff; border: 1px solid #e4ddd0; border-radius: 16px; overflow: hidden; }
+  .pricing-card-header { background: #1a2e4a; padding: 1rem 1.4rem; }
+  .pricing-card-header h3 { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 600; color: #fff; }
+  .pricing-card-header p { font-size: 12px; color: rgba(255,255,255,0.55); }
+  .pricing-card-body { padding: 1.1rem 1.4rem; }
+  .price-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid #f0ede8; font-size: 13px; }
+  .price-row:last-child { border-bottom: none; }
+  .price-label { color: #4a5b6d; }
+  .price-val { font-weight: 600; color: #1a2e4a; white-space: nowrap; margin-left: 8px; }
+  .price-note { font-size: 11px; color: #7a8a9a; margin-top: 10px; line-height: 1.6; }
+  .price-state { font-size: 10px; font-weight: 600; background: #eaf3de; color: #3b6d11; padding: 2px 7px; border-radius: 20px; margin-left: 5px; }
+  .price-strike { text-decoration: line-through; color: #a0a8b0; font-weight: 400; margin-right: 6px; font-size: 12px; }
+  .price-save { font-size: 10px; font-weight: 700; background: #faeeda; color: #7a4a0a; padding: 2px 7px; border-radius: 20px; margin-left: 5px; }
+  .intro-banner { background: linear-gradient(135deg, #7a4a0a, #a06020); border-radius: 12px; padding: 0.85rem 1.25rem; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .intro-banner p { font-size: 13px; color: #fff; margin: 0; line-height: 1.5; }
+  .intro-banner strong { color: #fdf0cc; }
+
+  /* ── Quote CTA banner ── */
+  .quote-cta-banner { background: linear-gradient(135deg, #1a2e4a, #243d5e); border-radius: 16px; padding: 1.5rem 1.75rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: 2rem; }
+  .quote-cta-banner p { font-size: 14px; color: rgba(255,255,255,0.7); margin: 0; }
+  .quote-cta-banner h4 { font-family: 'Cormorant Garamond', serif; font-size: 19px; font-weight: 600; color: #fff; margin-bottom: 3px; }
+  .btn-quote { background: #c9a84c; color: #1a2e4a; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 700; padding: 11px 24px; border-radius: 8px; border: none; cursor: pointer; white-space: nowrap; }
+  .btn-quote:hover { background: #b8943e; }
+
+  /* ── Discounts ── */
+  .discount-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin-bottom: 2rem; }
+  .discount-card { background: #fff; border: 1px solid #e4ddd0; border-radius: 12px; padding: 1rem 1.1rem; display: flex; gap: 10px; align-items: flex-start; }
+  .discount-icon { font-size: 20px; flex-shrink: 0; }
+  .discount-card h4 { font-size: 13px; font-weight: 600; color: #1a2e4a; margin-bottom: 2px; }
+  .discount-card p { font-size: 12px; color: #5a6b7e; line-height: 1.55; }
+
+  /* ── How it works ── */
+  .steps-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
+  .step-card { background: #fff; border: 1px solid #e4ddd0; border-radius: 14px; padding: 1.4rem; text-align: center; }
+  .step-num { width: 34px; height: 34px; border-radius: 50%; background: #1a2e4a; color: #c9a84c; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; }
+  .step-card h4 { font-size: 14px; font-weight: 600; color: #1a2e4a; margin-bottom: 4px; }
+  .step-card p { font-size: 13px; color: #5a6b7e; line-height: 1.6; }
+  .step-link { cursor: pointer; transition: box-shadow 0.2s, border-color 0.2s, transform 0.2s; }
+  .step-link:hover { border-color: #c9a84c; box-shadow: 0 4px 20px rgba(26,46,74,0.1); transform: translateY(-2px); }
+  .step-cta { display: inline-block; margin-top: 10px; font-size: 12px; font-weight: 700; color: #7a4a0a; background: #f5e9cc; padding: 5px 12px; border-radius: 20px; border: none; cursor: pointer; font-family: 'Inter', sans-serif; }
+  .step-cta:hover { background: #c9a84c; color: #1a2e4a; }
+  .step-cta-row { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; }
+
+  /* ── Why GSS ── */
+  .why-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
+  .why-card { background: #fff; border: 1px solid #e4ddd0; border-radius: 14px; padding: 1.25rem; display: flex; gap: 12px; align-items: flex-start; }
+  .why-icon { font-size: 22px; flex-shrink: 0; margin-top: 2px; }
+  .why-card h4 { font-size: 14px; font-weight: 600; color: #1a2e4a; margin-bottom: 4px; }
+  .why-card p { font-size: 13px; color: #5a6b7e; line-height: 1.65; }
+
+  /* ── Info ── */
+  .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .info-card { background: #fff; border: 1px solid #e4ddd0; border-radius: 12px; padding: 1rem 1.1rem; display: flex; gap: 10px; align-items: flex-start; }
+  .info-icon { font-size: 20px; flex-shrink: 0; }
+  .info-card p { font-size: 13px; color: #4a5b6d; line-height: 1.6; }
+
+  /* ── Service area ── */
+  .area-box { background: #1a2e4a; border-radius: 16px; padding: 2rem; }
+  .area-box .section-title { color: #fff; margin-bottom: 0.5rem; }
+  .area-box > p { font-size: 14px; color: rgba(255,255,255,0.6); line-height: 1.75; margin-bottom: 1.5rem; }
+  .map-placeholder { background: rgba(255,255,255,0.05); border: 1px dashed rgba(201,168,76,0.3); border-radius: 12px; width: 100%; aspect-ratio: 1 / 1; max-width: 460px; margin: 0 auto; display: flex; align-items: center; justify-content: center; }
+  .map-placeholder span { font-size: 13px; color: rgba(255,255,255,0.25); letter-spacing: 0.04em; }
+  .area-note { font-size: 12px; color: rgba(255,255,255,0.35); margin-top: 1rem; text-align: center; }
+
+  @media (max-width: 560px) {
+    .nov-grid, .pkg-cols { grid-template-columns: 1fr; } .partner-bar { flex-direction: column; text-align: center; }
+    .now-block { grid-template-columns: 1fr; } .now-row:nth-last-child(2) { border-bottom: 1px solid #f0ede8; }
+    .services-grid, .pricing-grid, .discount-grid, .steps-grid, .why-grid { grid-template-columns: 1fr; } .info-grid { grid-template-columns: 1fr; }
+    .hero-actions { flex-direction: column; align-items: center; }
+    .trust-inner { gap: 0.75rem; }
+    .quote-cta-banner { flex-direction: column; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">APPOINTMENT REQUIRED</div>
+    <h1>From Notarization to<br>Apostille —<br><em>We Handle It All.</em></h1>
+    <p>Professional notary and document services for individuals, businesses, title companies, and escrow officers.</p>
+    <div class="hero-actions">
+      <button class="btn-primary" onclick="window.open('https://www.goldenstatesignature.com/appointment','_blank')">Book an Appointment</button>
+      <button class="btn-secondary" onclick="window.open('https://www.goldenstatesignature.com/quote-and-chat','_blank')">Get a Free Quote</button>
+      <button class="btn-secondary" onclick="window.open('sms:9166226790','_blank')">Text 916-622-6790</button>
+    </div>
+  </div>
+</section>
+
+<!-- Trust bar — all one line -->
+<div style="background:#f5e9cc; border-bottom:1px solid #e8d5a0; padding:0.6rem 2rem; text-align:center;">
+  <p style="font-size:13px; color:#7a4a0a; margin:0;">📍 2020 Hurley Way, Ste 215, Sacramento, CA 95825&nbsp;&nbsp;</p>
+</div>
+
+<!-- Animated ticker bar -->
+<div class="ticker-wrap">
+  <div class="ticker-track">
+    <div class="ticker-item"><span class="ticker-icon">⚖️</span><span class="ticker-text">California Commissioned Notary — <span>3× Commissioned Since 2018</span></span></div>
+    <div class="ticker-item"><span class="ticker-icon">🏅</span><span class="ticker-text">Apostille Services — <span>Now Available</span></span></div>
+    <div class="ticker-item"><span class="ticker-icon">🛡️</span><span class="ticker-text">$100K E&O · $1M General Liability · <span>$15K Bond</span></span></div>
+    <div class="ticker-item"><span class="ticker-icon">📅</span><span class="ticker-text">Evening 5-9pm & All Day Weekends — <span>(Mobile & In-Office)</span></span></div>
+    <div class="ticker-item"><span class="ticker-icon">📍</span><span class="ticker-text">Mobile Service Up to 30 Miles · Sacramento Area</span></div>
+    <div class="ticker-item"><span class="ticker-icon">🏡</span><span class="ticker-text">Loan Signings · Title & Escrow · Apostille · General Notary</span></div>
+    <div class="ticker-item"><span class="ticker-icon">⚡</span><span class="ticker-text">Same-Day Available <i>(Limited)</i> — <span>Text 916-622-6790</span></span></div>
+    <div class="ticker-item"><span class="ticker-icon">🔍</span><span class="ticker-text">Background Screened · Fully Insured</span></div>
+    <div class="ticker-item"><span class="ticker-icon">💼</span><span class="ticker-text">ACH Invoicing for Title & Escrow Companies</span></div>
+    <div class="ticker-item"><span class="ticker-icon">🎉</span><span class="ticker-text">Introductory Pricing — <span>Through Jan 31, 2027</span></span></div>
+    <div class="ticker-item"><span class="ticker-icon">🌐</span><span class="ticker-text">Instant Quote at <span>goldenstatesignature.com</span></span></div>
+    <!-- Duplicate for seamless loop -->
+    <div class="ticker-item"><span class="ticker-icon">⚖️</span><span class="ticker-text">California Commissioned Notary — <span>3× Commissioned Since 2018</span></span></div>
+    <div class="ticker-item"><span class="ticker-icon">🏅</span><span class="ticker-text">Apostille Services — <span>Now Available</span></span></div>
+    <div class="ticker-item"><span class="ticker-icon">🛡️</span><span class="ticker-text">$100K E&O · $1M General Liability · <span>$15K Bond</span></span></div>
+    <div class="ticker-item"><span class="ticker-icon">🌙</span><span class="ticker-text">Evenings 5–9pm <span>(In-Office: Mon/Wed/Fri · Mobile: Tue/Thu)</span></span></div>
+    <div class="ticker-item"><span class="ticker-icon">📅</span><span class="ticker-text">Weekends 9am–9pm — <span>Mobile & In-Office</span></span></div>
+    <div class="ticker-item"><span class="ticker-icon">📍</span><span class="ticker-text">Mobile Service Up to 25 Miles · Sacramento Area</span></div>
+    <div class="ticker-item"><span class="ticker-icon">🏡</span><span class="ticker-text">Loan Signings · Title & Escrow · Apostille · General Notary</span></div>
+    <div class="ticker-item"><span class="ticker-icon">⚡</span><span class="ticker-text">Same-Day Available — <span>Text 916-622-6790</span></span></div>
+    <div class="ticker-item"><span class="ticker-icon">🔍</span><span class="ticker-text">Background Screened · Fully Insured</span></div>
+    <div class="ticker-item"><span class="ticker-icon">💼</span><span class="ticker-text">ACH Invoicing for Title & Escrow Companies</span></div>
+    <div class="ticker-item"><span class="ticker-icon">🎉</span><span class="ticker-text">Introductory Pricing — <span>Through Jan 31, 2027</span></span></div>
+    <div class="ticker-item"><span class="ticker-icon">🌐</span><span class="ticker-text">Instant Quote at <span>goldenstatesignature.com</span></span></div>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- Services -->
+  <div class="section-eyebrow">What we offer</div>
+  <h2 class="section-title">Services</h2>
+  <p class="section-sub">Full-service notary and document solutions — in office or at your location.<br></p>
+
+  <p class="tier-label tier-now">Available Now</p>
+  <div class="now-block">
+    <div class="now-row"><div class="now-icon">📋</div><div><h3>General Notarization</h3><p>Acknowledgments, jurats, oaths, copy certification, POAs, trusts, and affidavits. Mobile or in-office.</p></div></div>
+    <div class="now-row"><div class="now-icon">🏡</div><div><h3>Loan Signing</h3><p>Refinance, purchase, HELOC, reverse mortgage, and seller packages.</p></div></div>
+    <div class="now-row"><div class="now-icon">🏦</div><div><h3>Title &amp; Escrow Signing</h3><p>Direct service for title companies, escrow officers, and lenders.</p></div></div>
+    <div class="now-row"><div class="now-icon">🌐</div><div><h3>Apostille</h3><p>Same-week and overnight service.<br><span class="now-note">Same-day rush &amp; 48-hour coming June 2027</span></p></div></div>
+    <div class="now-row"><div class="now-icon">📷</div><div><h3>2x2 Passport &amp; Visa Photos</h3><p>State Department compliant.<br><span class="now-note">Saturdays</span></p></div></div>
+    <div class="now-row"><div class="now-icon">📄</div><div><h3>Copy Certification</h3><p>Certified copies of powers of attorney and notarial journal entries.</p></div></div>
+  </div>
+
+  <p class="tier-label tier-sept">Coming November 1, 2026</p>
+  <div class="nov-grid">
+    <div class="service-card coming">
+      <div class="service-icon icon-muted">🔍</div>
+      <h3>Live Scan Fingerprinting</h3>
+      <p>DOJ and FBI-approved fingerprinting. In-office or mobile.</p>
+      <p class="pkg-head">Who needs it</p>
+      <div class="who-list">
+        <span class="who-chip">Teachers &amp; school staff</span><span class="who-chip">Nurses &amp; caregivers</span><span class="who-chip">Staffing agencies</span><span class="who-chip">Security guards</span><span class="who-chip">Real estate agents</span><span class="who-chip">Contractors</span><span class="who-chip">Foster &amp; adoptive parents</span><span class="who-chip">Volunteers</span><span class="who-chip">New &amp; renewing notaries</span>
+      </div>
+    </div>
+    <div class="service-card coming">
+      <div class="service-icon icon-muted">🖋️</div>
+      <h3>Notary All-in-One Package</h3>
+      <p>For new and renewing California notaries. In-office.</p>
+      <div class="pkg-cols">
+        <div>
+          <p class="pkg-head">What we offer</p>
+          <ul class="pkg-list">
+            <li>Live Scan fingerprinting</li>
+            <li>2x2 color exam application photo</li>
+            <li>Oath of office notarized</li>
+          </ul>
+        </div>
+        <div>
+          <p class="pkg-head">&nbsp;</p>
+          <ul class="pkg-list">
+            <li>Starter kit: journal, thumbprint pad, locking bag</li>
+            <li>Oath &amp; bond mailed overnight or certified, or mail it yourself</li>
+            <li>Step-by-step guide with course, bond &amp; stamp links</li>
+          </ul>
+        </div>
+      </div>
+      <button class="btn-partner" style="margin-top:14px;" onclick="window.open('https://www.goldenstatesignature.com/notary-package','_blank')">See the Step-by-Step Guide →</button>
+    </div>
+  </div>
+
+  <div class="partner-bar">
+    <div class="partner-icon">🛒</div>
+    <div class="partner-text">
+      <p class="pkg-head" style="margin:0 0 2px !important;">Recommended Supplier</p>
+      <p><strong>NotaryX</strong> — California notary stamps, embossers, journals, and bonds from a local Lincoln, CA supplier. Order once your commission arrives.</p>
+    </div>
+    <button class="btn-partner" onclick="window.open('https://notaryx.com/','_blank')">Shop NotaryX →</button>
+  </div>
+
+  <p class="tier-label tier-feb">Coming 2027</p>
+  <div class="services-grid" style="margin-bottom:2rem;">
+    <div class="service-card coming">
+      <div class="service-icon icon-muted">🏢</div>
+      <h3>Business Launch Package</h3>
+      <p>EIN, Secretary of State filing, Statement of Information, basic website, and business card design and ordering. Filed using the details you provide.</p>
+      <p class="now-note" style="color:#1a2e4a; font-weight:600; margin:0;">February 2027</p>
+    </div>
+    <div class="service-card coming">
+      <div class="service-icon icon-muted">🏛️</div>
+      <h3>Registered Agent Service</h3>
+      <p>Registered agent representation for California businesses. Office open weekdays 9am–5pm to receive legal documents.</p>
+      <p class="now-note" style="color:#1a2e4a; font-weight:600; margin:0;">July 2027</p>
+    </div>
+  </div>
+
+  <hr class="divider" />
+
+  <!-- Pricing -->
+  <div class="section-eyebrow">Transparent pricing</div>
+  <h2 class="section-title">Rates & Fees</h2>
+  <p class="section-sub">All fees disclosed upfront before your appointment. Surcharges apply based on time of day — refer to the schedule below.</p>
+
+  <!-- Introductory pricing banner -->
+  <div class="intro-banner">
+    <span style="font-size:20px;">🎉</span>
+    <p><strong>Introductory Pricing — Now through January 31, 2027.</strong> Standard rates take effect February 1, 2027. Book now to lock in savings.</p>
+  </div>
+
+  <div class="pricing-grid">
+    <div class="pricing-card">
+      <div class="pricing-card-header">
+        <h3>General Notary</h3>
+        <p>California state-regulated fees</p>
+      </div>
+      <div class="pricing-card-body">
+        <div class="price-row"><span class="price-label">Acknowledgment / Jurat <span class="price-state">CA Max</span></span><span class="price-val">$15/sig</span></div>
+        <div class="price-row"><span class="price-label">Oath or Affirmation</span><span class="price-val">$15/sig</span></div>
+        <div class="price-row"><span class="price-label">Copy Certification</span><span class="price-val">$15/cert</span></div>
+        <div class="price-row"><span class="price-label">Wills, Trusts & Estate Docs</span><span class="price-val">$15/sig</span></div>
+        <div class="price-row"><span class="price-label">Additional signer (same appt)</span><span class="price-val">$15/sig</span></div>
+        <p class="price-note">No limit on number of signatures per appointment.</p>
+      </div>
+    </div>
+
+    <div class="pricing-card">
+      <div class="pricing-card-header">
+        <h3>Loan Signing</h3>
+        <p>Flat-rate packages — introductory pricing</p>
+      </div>
+      <div class="pricing-card-body">
+        <div class="price-row"><span class="price-label">Refinance</span><span class="price-val"><span class="price-strike">$150</span>$125 <span class="price-save">Save $25</span></span></div>
+        <div class="price-row"><span class="price-label">Purchase</span><span class="price-val"><span class="price-strike">$165</span>$135 <span class="price-save">Save $30</span></span></div>
+        <div class="price-row"><span class="price-label">Seller Package</span><span class="price-val"><span class="price-strike">$125</span>$110 <span class="price-save">Save $15</span></span></div>
+        <div class="price-row"><span class="price-label">Reverse Mortgage</span><span class="price-val"><span class="price-strike">$225</span>$150 <span class="price-save">Save $75</span></span></div>
+        <div class="price-row"><span class="price-label">HELOC / Loan Mod</span><span class="price-val"><span class="price-strike">$110</span>$100 <span class="price-save">Save $10</span></span></div>
+        <p class="price-note">Standard rates effective Feb 1, 2027. Scan-back (+$25) and printing (+$25–$50) available if required by your lender. Escrow invoicing accepted.</p>
+      </div>
+    </div>
+
+    <div class="pricing-card">
+      <div class="pricing-card-header">
+        <h3>Title & Escrow Signing</h3>
+        <p>Direct service for title & escrow — introductory pricing</p>
+      </div>
+      <div class="pricing-card-body">
+        <div class="price-row"><span class="price-label">Standard Signing Package</span><span class="price-val"><span class="price-strike">$165</span>$135 <span class="price-save">Save $30</span></span></div>
+        <div class="price-row"><span class="price-label">Seller Closing Package</span><span class="price-val"><span class="price-strike">$125</span>$110 <span class="price-save">Save $15</span></span></div>
+        <div class="price-row"><span class="price-label">Scan-back to title/escrow</span><span class="price-val">+$25</span></div>
+        <div class="price-row"><span class="price-label">Print (if required)</span><span class="price-val">+$25–$50</span></div>
+        <p class="price-note">Direct invoicing & ACH available. Standard rates effective Feb 1, 2027. Contact us for volume or preferred account pricing.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quote CTA banner -->
+  <div class="quote-cta-banner">
+    <div>
+      <h4>Want an exact price for your appointment?</h4>
+      <p>Enter your address and get an instant, itemized quote — travel fee included.</p>
+    </div>
+    <button class="btn-quote" onclick="window.open('https://www.goldenstatesignature.com/quote-and-chat','_blank')">Get My Quote →</button>
+  </div>
+
+  <!-- Discounts -->
+  <div style="margin-top:2rem; margin-bottom:0.75rem;">
+    <div class="section-eyebrow">Discounts</div>
+  </div>
+  <div class="discount-grid">
+    <div class="discount-card">
+      <div class="discount-icon">🎖️</div>
+      <div>
+        <h4>Military & Veterans</h4>
+        <p>10% off with valid military ID. Active duty, veterans, and immediate family. Veterans Day — no surcharge.</p>
+      </div>
+    </div>
+    <div class="discount-card">
+      <div class="discount-icon">🤝</div>
+      <div>
+        <h4>Repeat Clients</h4>
+        <p>Negotiated rates for high-volume and repeat clients. Contact us to discuss.</p>
+      </div>
+    </div>
+    <div class="discount-card">
+      <div class="discount-icon">🏢</div>
+      <div>
+        <h4>Business Accounts</h4>
+        <p>Preferred rates for title companies, escrow offices, and signing services. ACH invoicing available.</p>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider" />
+
+  <!-- How it works -->
+  <div class="section-eyebrow">The process</div>
+  <h2 class="section-title">How it works</h2>
+  <div class="steps-grid">
+    <div class="step-card step-link" onclick="window.open('https://www.goldenstatesignature.com/quote-and-chat','_blank')">
+      <div class="step-num">1</div>
+      <h4>Get a Quote</h4>
+      <p>Use our instant quote tool to see your exact price before booking.</p>
+      <span class="step-cta">Get My Quote →</span>
+    </div>
+    <div class="step-card">
+      <div class="step-num">2</div>
+      <h4>Book or Text</h4>
+      <p>Schedule online or text us directly. Evenings, weekends, and after-hours available.</p>
+      <div class="step-cta-row">
+        <button class="step-cta" onclick="window.open('https://www.goldenstatesignature.com/appointment','_blank')">Book →</button>
+        <button class="step-cta" onclick="window.open('sms:9166226790','_blank')">Text →</button>
+      </div>
+    </div>
+    <div class="step-card step-link" onclick="window.open('https://www.goldenstatesignature.com/travel-rates','_blank')">
+      <div class="step-num">3</div>
+      <h4>Choose Your Location</h4>
+      <p>Come in to our office or we travel to you — home, hospital, office, or signing table.</p>
+      <span class="step-cta">Travel Rates →</span>
+    </div>
+    <div class="step-card">
+      <div class="step-num">4</div>
+      <h4>Bring Valid ID</h4>
+      <p>Government-issued photo ID required for all signers. No exceptions under California law.</p>
+    </div>
+    <div class="step-card">
+      <div class="step-num">5</div>
+      <h4>Sign & Pay</h4>
+      <p>Documents notarized on the spot. Payment due at time of service.</p>
+    </div>
+  </div>
+
+
+  <!-- Before your appointment -->
+  <p class="info-sub">Before your appointment</p>
+  <div class="info-grid">
+    <div class="info-card">
+      <div class="info-icon">🪪</div>
+      <p><strong>Valid government-issued photo ID required</strong> for all signers. Driver's license, state ID, passport, or military ID accepted.</p>
+    </div>
+    <div class="info-card">
+      <div class="info-icon">⚖️</div>
+      <p><strong>Notaries cannot provide legal advice</strong> or prepare documents. Please consult a licensed attorney for legal guidance.</p>
+    </div>
+    <div class="info-card">
+      <div class="info-icon">📄</div>
+      <p><strong>Documents must be complete</strong> before your appointment. Blank spaces or missing pages cannot be notarized under California law.</p>
+    </div>
+    <div class="info-card">
+      <div class="info-icon">💳</div>
+      <p><strong>Payment is due at time of service.</strong> Cash, all major cards, Apple Pay, Google Pay, Zelle, Venmo, and CashApp accepted. <a href="https://www.goldenstatesignature.com/accepted-payments" target="_blank" rel="noopener">See all payment options →</a></p>
+    </div>
+  </div>
+
+  <hr class="divider" />
+
+  <!-- Why GSS -->
+  <div class="section-eyebrow">Why Golden State Signature</div>
+  <h2 class="section-title">What sets us apart</h2>
+  <div class="why-grid">
+    <div class="why-card">
+      <div class="why-icon">🛡️</div>
+      <div>
+        <h4>Fully Insured & Bonded</h4>
+        <p>$15,000 surety bond, $100,000 E&O, and $1M general liability on every signing.</p>
+      </div>
+    </div>
+    <div class="why-card">
+      <div class="why-icon">⚡</div>
+      <div>
+        <h4>Same-Day Available</h4>
+        <p>Evenings, weekends, and after-hours available. Need it today — text us directly.</p>
+      </div>
+    </div>
+    <div class="why-card">
+      <div class="why-icon">📍</div>
+      <div>
+        <h4>In-Office & Mobile</h4>
+        <p>Visit our office or let us come to you — wherever you need us.</p>
+      </div>
+    </div>
+    <div class="why-card">
+      <div class="why-icon">🎓</div>
+      <div>
+        <h4>Experienced &amp; Commissioned</h4>
+        <p>California-commissioned notary since 2018, three commissions. Background-screened.</p>
+      </div>
+    </div>
+    <div class="why-card">
+      <div class="why-icon">💼</div>
+      <div>
+        <h4>Business-Ready</h4>
+        <p>Direct invoicing and ACH available for title companies, escrow officers, and signing services.</p>
+      </div>
+    </div>
+    <div class="why-card">
+      <div class="why-icon">🔒</div>
+      <div>
+        <h4>Secure & Confidential</h4>
+        <p>Your documents and personal information handled with the highest level of discretion.</p>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider" />
+
+  <!-- Service area -->
+  <div class="area-box">
+    <div class="section-eyebrow">Service area</div>
+    <h2 class="section-title">Proudly Serving Sacramento</h2>
+    <p>Office at 2020 Hurley Way, Ste 215, CA 95825. Mobile appointments available throughout the greater Sacramento area, up to 30 miles.</p>
+    <button onclick="window.open('https://www.goldenstatesignature.com/travel-rates','_blank')" style="background:#c9a84c; color:#1a2e4a; font-family:'Inter',sans-serif; font-size:13px; font-weight:700; padding:11px 26px; border-radius:8px; border:none; cursor:pointer;">View Service Area Map →</button>
+  </div>
+
+</div>
+</body>
+</html>
