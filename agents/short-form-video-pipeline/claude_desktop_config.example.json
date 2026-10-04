@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "capcut": {
+      "command": "node",
+      "args": ["C:/path/to/capcut-mcp-server/dist/index.js"],
+      "env": {
+        "CAPCUT_DRAFTS_PATH": "C:/Users/<you>/AppData/Local/CapCut/User Data/Projects/com.lveditor.draft"
+      }
+    }
+  }
+}
