@@ -1,0 +1,41 @@
+# Owner-defined classification rules (example values)
+entity: Example Services, a Professional Corporation
+matching:
+  amount: exact
+  date_windows_days: [0, 3, 7, 15]
+
+rules:
+  - name: owner_money
+    when: counterparty == owner
+    direction:
+      in: Owner Contributions
+      out: Owner Distributions
+    never: Loan to Owner   # inactive account, never use
+
+  - name: home_office_reimbursement
+    when: transfer_to_owner and amount % 230 == 0
+    book_as: A/P bill payment
+    vendor: Owner (accountable plan)
+
+  - name: cash_customer
+    when: customer == "Recurring Cash Client"
+    book_as: Services income
+    invoice_required: false
+
+  - name: payment_never_deposited
+    when: customer_payment and not landed_in_business_account
+    book_as: Owner Distributions
+
+  - name: fallback
+    when: unexplained
+    book_as: Uncategorized Asset
+    reconcile: false
+    add_to_review_list: true
+
+duplicates:
+  criteria: same_amount and date_delta_days <= 3
+  action: reversing_journal_entry
+  doc_number_format: "CLN-{year}-{nn:02d}"
+
+guardrails:
+  forbid: [delete, send_email, file_return]
