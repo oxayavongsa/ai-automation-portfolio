@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mental Health Risk Modeling (Capstone)</title>
+<meta name="description" content="Capstone project predicting low, medium or high mental health risk from survey data. A tuned TabNet-style network reached 0.94 ROC AUC on 78K held-out responses, with a Gradio demo.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Mental Health Risk Modeling: Multiclass Risk Prediction with a TabNet-Style Network">
+<meta property="og:description" content="Capstone project predicting low, medium or high mental health risk from survey data. A tuned TabNet-style network reached 0.94 ROC AUC on 78K held-out responses, with a Gradio demo.">
+<meta property="og:url" content="https://oxayavongsa.github.io/ai-automation-portfolio/projects/mental-health-risk/">
+<meta property="og:image" content="https://oxayavongsa.github.io/ai-automation-portfolio/projects/mental-health-risk/preview.png">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="627">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://oxayavongsa.github.io/ai-automation-portfolio/projects/mental-health-risk/preview.png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0f17;--card:#121a26;--line:#223047;--ink:#e9eef6;--mute:#93a3ba;--acc:#5eead4;--acc2:#a78bfa}
+@media (prefers-color-scheme:light){:root{--bg:#f6f8fb;--card:#fff;--line:#dfe5ee;--ink:#0f1722;--mute:#5a6a80;--acc:#0d9488;--acc2:#7c3aed}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Inter,system-ui,sans-serif}
+.wrap{max-width:820px;margin:0 auto;padding:48px 16px 72px}
+.k{font:500 12px "JetBrains Mono",monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--acc)}
+h1{font-size:clamp(30px,6vw,46px);line-height:1.08;margin:10px 0 12px;letter-spacing:-.02em}
+.lede{color:var(--mute);margin:0 0 20px}
+img.hero{width:100%;border-radius:14px;border:1px solid var(--line);display:block;margin:0 0 24px}
+ul{padding-left:20px}li{margin:6px 0}
+.pills{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 26px}.pills span{border:1px solid var(--line);border-radius:99px;padding:4px 12px;font-size:13px;color:var(--mute)}
+.btn{display:inline-block;background:var(--acc);color:#0b0f17;font-weight:600;padding:10px 18px;border-radius:10px;text-decoration:none;margin:0 10px 10px 0}
+.btn.ghost{background:transparent;color:var(--acc);border:1px solid var(--line)}
+a.back{color:var(--mute);font-size:14px;text-decoration:none}
+</style></head><body><main class="wrap">
+<a class="back" href="https://oxayavongsa.github.io/ai-automation-portfolio/">← All projects</a>
+<p class="k">Capstone · Deep learning</p><h1>Mental Health Risk Modeling (Capstone)</h1><p class="lede">Can a short set of survey answers flag who is at low, medium or high risk, so outreach can start earlier? Risk labels came from K-Modes clustering, and the features that defined the clusters were removed before modeling to avoid label leakage.</p>
+<img class="hero" src="preview.png" alt="Mental Health Risk Modeling: Multiclass Risk Prediction with a TabNet-Style Network" width="1200" height="627">
+<ul><li><b>Data:</b> 260,986 survey responses after cleaning, with 182,690 for training and 78,296 held out for testing.</li><li><b>Best model:</b> a TabNet-inspired tabular neural network, tuned over a 54-configuration grid, with 0.79 accuracy, 0.78 macro F1 and 0.94 ROC AUC.</li><li><b>Compared:</b> logistic regression with polynomial features and elastic net (0.84 AUC) and a soft-voting ensemble (0.93 AUC).</li><li><b>Strongest signals:</b> mood swings, coping struggles and treatment history.</li><li><b>Demo:</b> a Gradio app for interactive predictions.</li><li><b>Course:</b> AAI-590 Capstone, M.S. Applied AI (University of San Diego).</li></ul><div class="pills"><span>Python</span><span>TensorFlow/Keras</span><span>scikit-learn</span><span>Optuna</span><span>K-Modes</span><span>Gradio</span></div><a class="btn" href="https://github.com/oxayavongsa/mental-health-risk-modeling">View code on GitHub →</a>
+</main></body></html>
