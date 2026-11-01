@@ -1,0 +1,992 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<div style="background:#0f1c33;color:#fff;font:600 13px system-ui,sans-serif;padding:8px 16px;text-align:center">Portfolio demo · business details replaced with placeholders · live AI quoting runs inside Claude; this static copy shows a worked example. <a href="https://github.com/oxayavongsa/ai-automation-portfolio/tree/main/apps/mobile-mechanic-quote" style="color:#ffb27a">Source &amp; write-up</a></div>
+<title>AI Mobile Mechanic Quote Tool</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: navy shop header with an orange stripe; customer view = one lump-sum estimate + call-to-action; shop view = work order (steps left, quote/parts/specs right) then an editable itemized invoice; AI chat is a slide-in sheet. */
+:root{
+  --bg:#f3f5f9; --surface:#ffffff; --ink:#0f1c33; --muted:#5b6880; --line:#d9dfea;
+  --navy:#16305a; --navy-ink:#ffffff; --accent:#e2600f; --accent-ink:#ffffff; --sky:#2f7fc1;
+  --ok:#1d7a4a; --warn:#b26a00; --bad:#b4232c; --chip:#e8edf5; --shade:rgba(10,20,40,.45);
+  --display:"Saira Condensed","Arial Narrow",Arial,sans-serif;
+  --body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0b1322; --surface:#121d31; --ink:#e7ecf5; --muted:#9aa7bd; --line:#24324d;
+  --navy:#0e1a30; --navy-ink:#e7ecf5; --accent:#ff7a2e; --accent-ink:#1a0b02; --sky:#6fb3ec;
+  --ok:#4cc58a; --warn:#f0a83a; --bad:#ff6b73; --chip:#1b2944; --shade:rgba(0,0,0,.6); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0b1322; --surface:#121d31; --ink:#e7ecf5; --muted:#9aa7bd; --line:#24324d;
+  --navy:#0e1a30; --navy-ink:#e7ecf5; --accent:#ff7a2e; --accent-ink:#1a0b02; --sky:#6fb3ec;
+  --ok:#4cc58a; --warn:#f0a83a; --bad:#ff6b73; --chip:#1b2944; --shade:rgba(0,0,0,.6); color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5}
+a{color:var(--sky)}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.wrap{max-width:1120px;margin-inline:auto;padding-inline:16px}
+
+.top{background:var(--navy);color:var(--navy-ink);border-bottom:4px solid var(--accent);padding-block:14px}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.brand h1{font-family:var(--display);font-weight:800;font-size:clamp(1.6rem,4vw,2.2rem);letter-spacing:.02em;margin:0;line-height:1;text-transform:uppercase}
+.brand h1 span{color:var(--accent)}
+.brand p{margin:0;font-size:.82rem;letter-spacing:.12em;text-transform:uppercase;opacity:.75}
+.viewswitch{display:flex;background:rgba(255,255,255,.12);border-radius:999px;padding:3px}
+.viewswitch button{border:0;background:transparent;color:var(--navy-ink);padding:6px 14px;border-radius:999px;font-weight:700;font-size:.85rem;cursor:pointer}
+.viewswitch button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+
+.lookup{background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:10px;margin-top:18px;padding:16px;display:grid;gap:14px}
+.lookup h2{font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:1.5rem;margin:0;line-height:1.1}
+.lookup .lede{margin:-6px 0 0;color:var(--muted)}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tab{border:1px solid var(--line);background:transparent;padding:8px 14px;border-radius:999px;cursor:pointer;font-weight:600;font-size:.9rem}
+.tab[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.field{display:grid;gap:4px;flex:1 1 140px;min-width:0}
+.field.wide{flex:3 1 260px}
+label,.lbl{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600}
+input,select,textarea{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 12px;min-height:44px}
+textarea{min-height:72px;resize:vertical}
+#vin{font-family:var(--mono);letter-spacing:.12em;text-transform:uppercase}
+.btn{border:0;border-radius:8px;padding:11px 18px;font-weight:700;cursor:pointer;min-height:44px;white-space:nowrap}
+.btn.primary{background:var(--accent);color:var(--accent-ink)}
+.btn.ghost{background:var(--chip);color:var(--ink)}
+.btn.small{min-height:34px;padding:6px 12px;font-size:.85rem}
+.btn:disabled{opacity:.55;cursor:wait}
+.note{font-size:.9rem;color:var(--muted);min-height:1.2em}
+.note b{color:var(--ink)} .note .bad{color:var(--bad)} .note .good{color:var(--ok)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chipbtn{border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:6px 10px;font-size:.85rem;cursor:pointer}
+.chipbtn[aria-pressed="true"]{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,var(--surface))}
+.recent{display:flex;gap:6px;flex-wrap:wrap;font-size:.85rem;align-items:center;color:var(--muted)}
+.recent button{border:1px dashed var(--line);background:transparent;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:.82rem}
+
+main{padding-block:22px 96px}
+.status{display:flex;gap:10px;align-items:center;flex-wrap:wrap;color:var(--muted);font-size:.95rem}
+.spin{width:18px;height:18px;border:3px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:s 1s linear infinite;flex:none}
+@keyframes s{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.spin{animation:none}}
+.err{border-left:4px solid var(--bad);background:var(--surface);padding:12px 14px;border-radius:6px}
+
+.ro-head{display:grid;gap:8px;margin-bottom:18px}
+.eyebrow{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700}
+.example{font-size:.8rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--warn)}
+.ro-head h2{font-family:var(--display);font-weight:800;font-size:clamp(1.6rem,4.5vw,2.4rem);line-height:1.05;margin:0;text-transform:uppercase;text-wrap:balance}
+.ro-head p{margin:0;max-width:65ch;color:var(--muted)}
+.vehiclebar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-family:var(--display);font-size:1.2rem;font-weight:700;text-transform:uppercase;letter-spacing:.03em}
+.vehiclebar .tag{font-family:var(--mono);font-size:.75rem;background:var(--chip);border-radius:999px;padding:3px 10px;color:var(--muted)}
+.meta{display:flex;gap:8px;flex-wrap:wrap}
+.pill{font-size:.8rem;font-weight:600;padding:4px 10px;border-radius:999px;background:var(--chip)}
+.pill.ok{color:var(--ok)} .pill.warn{color:var(--warn)} .pill.bad{color:var(--bad)}
+
+.grid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:820px){.grid{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;min-width:0}
+.panel h3{font-family:var(--display);font-size:1.05rem;letter-spacing:.08em;text-transform:uppercase;margin:0 0 10px;color:var(--muted)}
+.stack{display:grid;gap:20px;min-width:0}
+ol.steps{list-style:none;margin:0;padding:0;display:grid;gap:12px;counter-reset:st}
+ol.steps li{counter-increment:st;display:grid;grid-template-columns:34px minmax(0,1fr);gap:10px;align-items:start}
+ol.steps li::before{content:counter(st);font-family:var(--display);font-weight:800;font-size:1.05rem;background:var(--navy);color:var(--navy-ink);border-radius:6px;text-align:center;line-height:30px;height:30px}
+ol.steps b{display:block}
+ol.steps p{margin:2px 0 0;color:var(--muted)}
+.specs{width:100%;border-collapse:collapse;font-size:.92rem}
+.specs td{padding:7px 0;border-bottom:1px solid var(--line);vertical-align:top}
+.specs td:last-child{text-align:right;font-family:var(--mono);font-size:.85rem;padding-left:12px}
+.part{border-bottom:1px solid var(--line);padding-block:10px;display:grid;gap:4px}
+.part:last-child{border-bottom:0}
+.part .pn{display:flex;justify-content:space-between;gap:8px;font-weight:600}
+.part .pn > span{font-size:.8rem;color:var(--muted);white-space:nowrap;text-align:right}
+.part .sp{font-size:.85rem;color:var(--muted)}
+.svchead{font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-top:6px}
+.price{font-family:var(--mono);font-size:.82rem;color:var(--ink)}
+.buy{display:flex;gap:6px;flex-wrap:wrap;margin-top:2px}
+.buy a{font-size:.78rem;font-weight:600;text-decoration:none;border:1px solid var(--line);border-radius:5px;padding:3px 8px;color:var(--ink)}
+.buy a:hover{border-color:var(--accent)}
+ul.plain{margin:0;padding-left:18px;display:grid;gap:4px}
+.warnbox{border-left:4px solid var(--warn)}
+.fine{font-size:.8rem;color:var(--muted);margin-top:22px;max-width:75ch}
+
+.est{border:2px solid var(--accent)}
+.estrow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding-block:8px;border-bottom:1px solid var(--line)}
+.estrow b{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.estrow .strike{text-decoration:line-through;color:var(--muted);font-weight:500}
+.estrow.save b{color:var(--ok)}
+.estrow.total{border-bottom:0;padding-top:12px}
+.estrow.total span{font-family:var(--display);font-weight:800;font-size:1.2rem;text-transform:uppercase;letter-spacing:.04em}
+.estrow.total b{font-size:1.3rem;color:var(--accent)}
+.sub{font-size:.8rem;color:var(--muted);display:block;font-weight:500}
+.bigprice{font-family:var(--display);font-weight:800;font-size:clamp(2.2rem,7vw,3rem);line-height:1;color:var(--accent);font-variant-numeric:tabular-nums}
+.seg{display:flex;gap:4px;background:var(--chip);border-radius:8px;padding:3px;margin-bottom:12px}
+.seg button{flex:1;border:0;background:transparent;padding:8px 6px;border-radius:6px;font-weight:600;cursor:pointer;font-size:.88rem;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--accent);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.paystep{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:10px;align-items:center;padding-block:8px;border-bottom:1px solid var(--line)}
+.paystep i{font-style:normal;font-family:var(--display);font-weight:800;background:var(--navy);color:var(--navy-ink);border-radius:50%;width:26px;height:26px;display:grid;place-items:center}
+.paystep b{font-family:var(--mono);white-space:nowrap}
+.savebadge{display:inline-block;background:color-mix(in srgb,var(--ok) 15%,var(--surface));color:var(--ok);font-weight:700;border-radius:6px;padding:4px 10px;font-size:.9rem}
+
+.tablewrap{overflow-x:auto}
+table.svc{width:100%;border-collapse:collapse;font-size:.88rem;min-width:520px}
+table.svc th{text-align:left;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:6px 6px;border-bottom:1px solid var(--line);font-weight:600}
+table.svc td{padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+table.svc td.n,table.svc th.n{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+table.svc tfoot td{font-weight:700;border-bottom:0}
+@media (max-width:600px){
+  table.svc{min-width:0}
+  table.svc thead{display:none}
+  table.svc,table.svc tbody,table.svc tfoot,table.svc tr,table.svc td{display:block;width:100%}
+  table.svc tr{padding-block:8px;border-bottom:1px solid var(--line)}
+  table.svc td{border:0;padding:2px 0;display:flex;justify-content:space-between;gap:12px}
+  table.svc td.n{text-align:right}
+  table.svc td[data-label]::before{content:attr(data-label);font-family:var(--body);font-size:.8rem;color:var(--muted);font-weight:500;text-align:left}
+  table.svc td:first-child{font-weight:700}
+}
+
+.cta{background:var(--navy);color:var(--navy-ink);border-radius:10px;padding:18px;display:grid;gap:10px}
+.cta h3{color:var(--navy-ink);opacity:.85}
+.cta .phone{font-family:var(--display);font-weight:800;font-size:2rem;letter-spacing:.02em;line-height:1;user-select:all}
+.cta .acts{display:flex;gap:8px;flex-wrap:wrap}
+.cta a.btn{text-decoration:none;display:inline-flex;align-items:center}
+.msgpreview{margin:0;white-space:pre-wrap;font-family:var(--mono);font-size:.78rem;background:rgba(255,255,255,.08);border-radius:8px;padding:10px;max-height:180px;overflow:auto;user-select:all}
+.cta .mail{font-size:.9rem;opacity:.85;user-select:all;word-break:break-all}
+.safe{display:grid;gap:4px;border-left:4px solid var(--line);padding-left:12px}
+.safe.yes{border-color:var(--ok)} .safe.caution{border-color:var(--warn)} .safe.no{border-color:var(--bad)}
+.safe b.yes{color:var(--ok)} .safe b.caution{color:var(--warn)} .safe b.no{color:var(--bad)}
+
+/* invoice */
+.invoice{margin-top:24px;border-top:4px solid var(--navy)}
+.invhead{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-start}
+.invhead h3{font-size:1.4rem;color:var(--ink)}
+.invgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-block:12px}
+table.inv{width:100%;border-collapse:collapse;min-width:640px;font-size:.9rem}
+table.inv th{text-align:left;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:6px 4px;border-bottom:2px solid var(--line)}
+table.inv td{padding:4px;border-bottom:1px solid var(--line);vertical-align:middle}
+table.inv input,table.inv select{min-height:36px;padding:6px 8px}
+table.inv .num{width:90px;text-align:right;font-family:var(--mono)}
+table.inv .amt{text-align:right;font-family:var(--mono);white-space:nowrap;padding-right:8px}
+table.inv .x{border:0;background:transparent;color:var(--muted);cursor:pointer;font-size:1.1rem;padding:4px 8px}
+.invfoot{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-top:12px;align-items:flex-start}
+.invtot{min-width:260px;display:grid;gap:2px}
+.invtot .estrow{padding-block:5px}
+.invtot input{width:70px;min-height:32px;padding:4px 6px;font-family:var(--mono);text-align:right}
+
+/* chat sheet */
+.fab{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:20;border:0;border-radius:999px;background:var(--accent);color:var(--accent-ink);font-weight:800;padding:14px 20px;box-shadow:0 6px 20px rgba(0,0,0,.25);cursor:pointer;font-size:1rem}
+.shade{position:fixed;inset:0;background:var(--shade);z-index:30}
+.chat{position:fixed;z-index:31;right:0;top:0;bottom:0;width:min(420px,100%);background:var(--surface);border-left:1px solid var(--line);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.chat header{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 16px;border-bottom:4px solid var(--accent);background:var(--navy);color:var(--navy-ink)}
+.chat header b{font-family:var(--display);font-size:1.2rem;text-transform:uppercase;letter-spacing:.04em}
+.chat header small{display:block;opacity:.75;font-size:.8rem}
+.chat header button{background:transparent;border:1px solid rgba(255,255,255,.35);color:var(--navy-ink);border-radius:6px;padding:6px 10px;cursor:pointer}
+.msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px}
+.msg{max-width:88%;padding:10px 12px;border-radius:12px;white-space:pre-wrap;overflow-wrap:anywhere}
+.msg.user{align-self:flex-end;background:var(--accent);color:var(--accent-ink);border-bottom-right-radius:4px}
+.msg.ai{align-self:flex-start;background:var(--chip);border-bottom-left-radius:4px}
+.msg.sys{align-self:center;font-size:.85rem;color:var(--muted);background:transparent}
+.starters{display:grid;gap:6px}
+.starters button{text-align:left;border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:8px 10px;cursor:pointer;font-size:.9rem}
+.compose{display:flex;gap:8px;padding:12px 16px;border-top:1px solid var(--line)}
+.compose textarea{min-height:44px;max-height:140px}
+
+footer{border-top:1px solid var(--line);padding-block:18px;color:var(--muted);font-size:.85rem}
+footer .wrap{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.mono{font-family:var(--mono)}
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand"><h1>Example <span>Auto Mechanics</span></h1><p>Budget-friendly mobile mechanic · We come to you</p></div>
+      <div class="viewswitch" id="viewswitch" hidden>
+        <button type="button" data-view="customer" aria-pressed="false">Customer view</button>
+        <button type="button" data-view="shop" aria-pressed="false">Shop view</button>
+      </div>
+    </div>
+
+    <section class="lookup" id="c-form" aria-label="Get a quote">
+      <h2>What's going on with your car?</h2>
+      <p class="lede">Tell us the car and the problem. You'll get a plain-English explanation, an honest budget-friendly quote and how long it takes, in about a minute.</p>
+      <div class="row">
+        <div class="field"><label for="c-year">Year</label><select id="c-year"></select></div>
+        <div class="field"><label for="c-make">Make</label><input id="c-make" list="makes" placeholder="Honda"></div>
+        <div class="field"><label for="c-model">Model</label><input id="c-model" placeholder="Accord"></div>
+        <div class="field wide"><label for="c-vin">VIN (optional · needed to order exact parts)</label><input id="c-vin" maxlength="17" autocomplete="off" spellcheck="false" class="mono" placeholder="On the dash by the windshield or the door jamb"></div>
+      </div>
+      <div class="row">
+        <div class="field"><label for="c-name">Your name</label><input id="c-name" autocomplete="name" placeholder="First name"></div>
+        <div class="field"><label for="c-phone">Your phone</label><input id="c-phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="(916) 555-0123"></div>
+      </div>
+      <div class="field"><span class="lbl">Common problems</span><div class="chips" id="c-chips"></div></div>
+      <div class="field"><label for="c-problem">Describe it</label>
+        <textarea id="c-problem" placeholder="Grinding noise when I brake, worse in the morning…"></textarea></div>
+      <div class="row"><button class="btn primary" id="c-go" type="button">Get my quote</button><div class="note" id="c-note" aria-live="polite"></div></div>
+    </section>
+
+    <section class="lookup" id="s-form" aria-label="Find a vehicle" hidden>
+      <div class="tabs" role="tablist">
+        <button class="tab" role="tab" id="tab-vin" aria-selected="true" aria-controls="pane-vin">VIN</button>
+        <button class="tab" role="tab" id="tab-ymm" aria-selected="false" aria-controls="pane-ymm">Year / Make / Model</button>
+      </div>
+      <div id="pane-vin" role="tabpanel" aria-labelledby="tab-vin" class="row">
+        <div class="field wide"><label for="vin">17-character VIN</label>
+          <input id="vin" maxlength="17" autocomplete="off" spellcheck="false" placeholder="ZARFAEDN0J7000000"></div>
+        <button class="btn ghost" id="decode" type="button">Decode VIN</button>
+        <button class="btn ghost" id="photoBtn" type="button" hidden>Read VIN from photo</button>
+        <input id="photo" type="file" accept="image/*" capture="environment" hidden>
+      </div>
+      <div id="pane-ymm" role="tabpanel" aria-labelledby="tab-ymm" class="row" hidden>
+        <div class="field"><label for="year">Year</label><select id="year"></select></div>
+        <div class="field"><label for="make">Make</label><input id="make" list="makes" placeholder="Alfa Romeo"></div>
+        <div class="field"><label for="model">Model</label><input id="model" placeholder="Giulia"></div>
+        <div class="field"><label for="engine">Engine (optional)</label><input id="engine" placeholder="2.0L Turbo I4"></div>
+      </div>
+      <div class="note" id="vinout" aria-live="polite"></div>
+      <div class="field"><span class="lbl">Job (pick one or more)</span><div class="chips" id="jobs"></div></div>
+      <div class="row">
+        <div class="field wide"><label for="symptom">Or describe the problem / code</label>
+          <input id="symptom" placeholder="P0301 misfire, grinding when braking, no start, overheating…"></div>
+        <button class="btn primary" id="go" type="button">Get repair guide</button>
+      </div>
+      <div class="recent" id="recent" hidden></div>
+    </section>
+    <datalist id="makes"></datalist>
+  </div>
+</header>
+
+<main class="wrap">
+  <div id="c-out" aria-live="polite"></div>
+  <div id="s-out" aria-live="polite" hidden></div>
+  <section class="panel invoice" id="invoice" hidden aria-label="Invoice"></section>
+</main>
+
+<footer><div class="wrap"><span>Example Auto Mechanics · Sacramento &amp; surrounding areas</span><span class="mono">(555) 010-0199 · hello@example-auto.com</span></div></footer>
+
+<button class="fab" id="fab" type="button" hidden>Ask our AI</button>
+<div class="shade" id="shade" hidden></div>
+<aside class="chat" id="chat" hidden aria-label="AI assistant">
+  <header><div><b id="chatTitle">Example Auto Assistant</b><small id="chatSub">Ask about your car, prices or booking</small></div><button type="button" id="chatClose">Close</button></header>
+  <div class="msgs" id="msgs" aria-live="polite"></div>
+  <form class="compose" id="compose">
+    <textarea id="chatIn" rows="1" placeholder="Type your question…" aria-label="Message"></textarea>
+    <button class="btn primary" id="chatSend" type="submit">Send</button>
+  </form>
+</aside>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script>
+// ===== Business settings (ask Claude to change these) =====
+const BIZ = {
+  name: "Example Auto Mechanics",
+  phone: "(555) 010-0199", phoneRaw: "5550100199",
+  email: "hello@example-auto.com",
+  area: "Sacramento, CA and surrounding areas",
+  laborRateLow: 80,       // our labor $/hr, low end (used with the low book hours)
+  laborRateHigh: 80,     // our labor $/hr, high end (used with the high book hours)
+  manualLaborRate: 80,    // default $/hr for labor lines you add by hand on an invoice
+  partsTax: 8.75,         // % sales tax applied to parts on invoices (editable per invoice)
+  maxSpread: 200,         // keep every $ range within this
+  services: "oil change & filter, tune-up, brakes & rotors, brake fluid flush, spark plugs & wires, ignition coils, water pump & thermostat, radiator, head gasket, timing chain, transmission service & replacement, engine replacement, diagnostics"
+};
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const arr = x => Array.isArray(x) ? x : [];
+const money = n => "$" + Math.round(n).toLocaleString();
+const money2 = n => "$" + (Math.round(n*100)/100).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+const range = (a,b) => Math.round(a)===Math.round(b) ? money(a) : `${money(a)}–${money(b)}`;
+const fh = n => String(Math.round(n*10)/10);
+const hrs = (a,b) => (fh(a)===fh(b) ? fh(a) : `${fh(a)}–${fh(b)}`) + " hr";
+const tight = (lo,hi,max=BIZ.maxSpread) => { lo=+lo||0; hi=+hi||lo; if(hi<lo)[lo,hi]=[hi,lo]; if(hi-lo<=max) return [lo,hi]; const m=(lo+hi)/2; return [Math.max(0,m-max/2), m+max/2]; };
+
+const JOBS = ["Oil change & filter","Front brakes & rotors","Rear brakes & rotors","Brake fluid flush","Spark plugs","Ignition coils","Tune-up","Battery & alternator test","Starter","Alternator","Serpentine belt","Water pump","Thermostat","Radiator","Head gasket","Timing chain","Timing belt","Transmission service","Diagnose check engine light"];
+const SYMPTOMS = ["Check engine light is on","Won't start / clicks","Grinding or squealing brakes","Overheating","Oil change due","Shaking or misfiring","Leaking fluid","Strange noise"];
+const MAKES = ["Acura","Alfa Romeo","Aston Martin","Audi","Bentley","BMW","Buick","Cadillac","Chevrolet","Chrysler","Dodge","Ferrari","Fiat","Ford","Genesis","GMC","Honda","Hummer","Hyundai","Infiniti","Isuzu","Jaguar","Jeep","Kia","Lamborghini","Land Rover","Lexus","Lincoln","Lotus","Lucid","Maserati","Mazda","McLaren","Mercedes-Benz","Mercury","Mini","Mitsubishi","Nissan","Oldsmobile","Plymouth","Polestar","Pontiac","Porsche","Ram","Rivian","Rolls-Royce","Saab","Saturn","Scion","Smart","Subaru","Suzuki","Tesla","Toyota","Volkswagen","Volvo"];
+const WMI = {"1G1":"Chevrolet","1GC":"Chevrolet","1GN":"Chevrolet","1GB":"Chevrolet","2G1":"Chevrolet","3G1":"Chevrolet","3GN":"Chevrolet","3GC":"Chevrolet","KL1":"Chevrolet","KL7":"Chevrolet","1GT":"GMC","1GK":"GMC","2GT":"GMC","3GT":"GMC","1G6":"Cadillac","1GY":"Cadillac","1G4":"Buick","5GA":"Buick","KL4":"Buick","1G2":"Pontiac","2G2":"Pontiac","5Y2":"Pontiac","1G8":"Saturn","5GZ":"Saturn","1G3":"Oldsmobile","5GR":"Hummer","1FA":"Ford","1FM":"Ford","1FT":"Ford","1FD":"Ford","1FB":"Ford","1FC":"Ford","2FM":"Ford","3FA":"Ford","3FM":"Ford","3FE":"Ford","NM0":"Ford","MAJ":"Ford","1LN":"Lincoln","5LM":"Lincoln","2LM":"Lincoln","1ME":"Mercury","2ME":"Mercury","4M2":"Mercury","1C3":"Chrysler/Dodge","2C3":"Chrysler/Dodge","3C3":"Fiat/Chrysler","1C4":"Jeep/Dodge/Chrysler","2C4":"Chrysler/Dodge","3C4":"Chrysler/Dodge","1B3":"Dodge","2B3":"Dodge","1P3":"Plymouth","1D7":"Ram","3D7":"Ram","1C6":"Ram","3C6":"Ram","ZFB":"Ram/Fiat","1J4":"Jeep","1J8":"Jeep","ZAC":"Jeep","ZAR":"Alfa Romeo","ZAS":"Alfa Romeo","ZFA":"Fiat","ZAM":"Maserati","ZFF":"Ferrari","ZHW":"Lamborghini","1HG":"Honda","2HG":"Honda","2HK":"Honda","5FN":"Honda","5J6":"Honda","JHM":"Honda","19X":"Honda","SHH":"Honda","19U":"Acura","JH4":"Acura","5J8":"Acura","2HN":"Acura","4T1":"Toyota","4T3":"Toyota","4T4":"Toyota","5TD":"Toyota","5TF":"Toyota","5TE":"Toyota","5TB":"Toyota","2T1":"Toyota","2T3":"Toyota","JTD":"Toyota","JTE":"Toyota","JTM":"Toyota","JTN":"Toyota","JTK":"Toyota/Scion","JTL":"Toyota/Scion","JT2":"Toyota","JT3":"Toyota","JTH":"Lexus","JTJ":"Lexus","2T2":"Lexus","58A":"Lexus","1N4":"Nissan","1N6":"Nissan","3N1":"Nissan","3N6":"Nissan","5N1":"Nissan","JN1":"Nissan/Infiniti","JN8":"Nissan","KNM":"Nissan","JNK":"Infiniti","JNR":"Infiniti","5N3":"Infiniti","KMH":"Hyundai","5NP":"Hyundai","5NM":"Hyundai","KM8":"Hyundai","KMT":"Genesis","KNA":"Kia","KND":"Kia","5XX":"Kia","5XY":"Kia","3KP":"Kia","4S3":"Subaru","4S4":"Subaru","JF1":"Subaru","JF2":"Subaru","JM1":"Mazda","JM3":"Mazda","3MZ":"Mazda","3MV":"Mazda","JA3":"Mitsubishi","JA4":"Mitsubishi","4A3":"Mitsubishi","JS2":"Suzuki","JS3":"Suzuki","2S3":"Suzuki","JAA":"Isuzu","4S2":"Isuzu","1VW":"Volkswagen","3VW":"Volkswagen","WVW":"Volkswagen","WVG":"Volkswagen","WBA":"BMW","WBS":"BMW","WBX":"BMW","WBY":"BMW","5UX":"BMW","5UJ":"BMW","5YM":"BMW","3MW":"BMW","WMW":"Mini","WDD":"Mercedes-Benz","WDC":"Mercedes-Benz","WDB":"Mercedes-Benz","W1K":"Mercedes-Benz","W1N":"Mercedes-Benz","4JG":"Mercedes-Benz","55S":"Mercedes-Benz","WME":"Smart","WAU":"Audi","WA1":"Audi","WP0":"Porsche","WP1":"Porsche","YV1":"Volvo","YV4":"Volvo","7JR":"Volvo","YSM":"Polestar","LPS":"Polestar","YS3":"Saab","5YJ":"Tesla","7SA":"Tesla","LRW":"Tesla","XP7":"Tesla","7FC":"Rivian","7PD":"Rivian","50E":"Lucid","SAL":"Land Rover","SAJ":"Jaguar","SAD":"Jaguar","SCB":"Bentley","SCA":"Rolls-Royce","SCF":"Aston Martin","SCC":"Lotus","SBM":"McLaren"};
+const YEARCODE = "ABCDEFGHJKLMNPRSTVWXY123456789";
+const TRANS = {A:1,B:2,C:3,D:4,E:5,F:6,G:7,H:8,J:1,K:2,L:3,M:4,N:5,P:7,R:9,S:2,T:3,U:4,V:5,W:6,X:7,Y:8,Z:9};
+const WEIGHTS = [8,7,6,5,4,3,2,10,0,9,8,7,6,5,4,3,2];
+function checkDigit(v){
+  let sum = 0;
+  for(let i=0;i<17;i++){ const c=v[i]; const n = /\d/.test(c)?+c:TRANS[c]; if(n===undefined) return null; sum += n*WEIGHTS[i]; }
+  const r = sum % 11; return r===10 ? "X" : String(r);
+}
+function decodeVin(raw){
+  const v = raw.toUpperCase().replace(/[^A-Z0-9]/g,"");
+  if(v.length!==17) return {error:`VIN must be 17 characters (you have ${v.length}).`};
+  if(/[IOQ]/.test(v)) return {error:"VINs never contain I, O or Q. Check for a 1 or 0."};
+  const idx = YEARCODE.indexOf(v[9]); let year = null;
+  if(idx>=0){ year = 1980+idx; if(/[A-Z]/.test(v[6]) && year<2010) year += 30; if(year>new Date().getFullYear()+1) year -= 30; }
+  return {vin:v, make:WMI[v.slice(0,3)]||null, year, checkOk: checkDigit(v)===v[8]};
+}
+const vName = v => [v.year, v.make, v.model, v.trim, v.engine].filter(Boolean).join(" ");
+
+// ===== state =====
+let sample = null, downloads = null, isStaff = false, view = "customer";
+let mode = "vin", jobs = new Set([JOBS[1]]), vehicle = null, ctl = null, cctl = null;
+const last = { customer:null, shop:null };
+
+// ===== pricing =====
+function services(g){
+  if(arr(g.services).length) return g.services;
+  return arr(g.parts).length ? [{name:g.title, labor_hours_low:g.labor_hours_low, labor_hours_high:g.labor_hours_high, shop_labor_low:g.shop_labor_low, shop_labor_high:g.shop_labor_high, parts:g.parts}] : [];
+}
+function svcPrice(s){
+  let pl=0, ph=0;
+  arr(s.parts).forEach(p=>{ const lo=+p.price_low||0; pl+=lo; ph+=(+p.price_high||lo); });
+  const [hl,hh] = tight(s.labor_hours_low, s.labor_hours_high, 1);
+  const [sl,sh] = tight(s.shop_labor_low, s.shop_labor_high);
+  [pl,ph] = tight(pl,ph);
+  return {pl,ph,hl,hh,sl,sh,ol:hl*BIZ.laborRateLow,oh:hh*BIZ.laborRateHigh};
+}
+function shrink(lo,hi,f){ const m=(lo+hi)/2, w=(hi-lo)*f/2; return [Math.max(0,m-w), m+w]; }
+function price(g){
+  const raw = services(g).map(s=>({s, p:svcPrice(s)}));
+  // Keep the customer total within maxSpread by narrowing every range around its midpoint,
+  // so service rows, parts, labor and the total always add up exactly.
+  let rp=0, rh=0, rs=0;
+  raw.forEach(({p})=>{ rp+=p.ph-p.pl; rh+=p.hh-p.hl; rs+=p.sh-p.sl; });
+  const spread = rp + rh*BIZ.laborRateHigh;
+  const f = spread > BIZ.maxSpread ? BIZ.maxSpread/spread : 1;
+  const fs = rs > BIZ.maxSpread ? BIZ.maxSpread/rs : 1;
+  const svcs = raw.map(({s,p})=>{
+    const [pl,ph]=shrink(p.pl,p.ph,f), [hl,hh]=shrink(p.hl,p.hh,f), [sl,sh]=shrink(p.sl,p.sh,fs);
+    return {s, p:{pl,ph,hl,hh,sl,sh,ol:hl*BIZ.laborRateLow,oh:hh*BIZ.laborRateHigh}};
+  });
+  const T={pl:0,ph:0,hl:0,hh:0,sl:0,sh:0,ol:0,oh:0};
+  svcs.forEach(({p})=>{ for(const k in T) T[k]+=p[k]; });
+  const {pl,ph,hl,hh,sl,sh,ol,oh}=T;
+  const shopMid=(sl+sh)/2, ourMid=(ol+oh)/2;
+  const pct = shopMid>0 ? Math.round((1-ourMid/shopMid)*100) : 0;
+  return {svcs,pl,ph,hl,hh,sl,sh,ol,oh,tl:pl+ol,th:ph+oh,stl:pl+sl,sth:ph+sh,pct};
+}
+
+// ===== shared AI prompt (one call feeds both views, cached 24h) =====
+function guidePrompt(v, task){
+  return `You are a master ASE-certified technician advising ${BIZ.name}, a budget-friendly MOBILE mechanic in ${BIZ.area} (works in the customer's driveway or parking lot, no lift). Customers are cost-conscious: when there are several ways to fix it, base the services on the most cost-effective reliable repair, and don't add upsells that aren't needed.
+Vehicle: ${vName(v)}${v.vin?` (VIN ${v.vin})`:""}
+Job(s) / complaint: ${task}
+
+Be specific to this exact vehicle and engine, including European and exotic makes. If the complaint needs diagnosis, base the jobs on the most likely fix and say so.
+Give real factory torque specs, capacities and fluid types when you know them; if unsure, write "verify in service info" instead of guessing.
+Reply with only JSON in exactly this shape:
+{"title":string,"summary":string,"customer_explanation":string,"customer_steps":[string],
+"safe_to_drive":"yes"|"caution"|"no","safety_note":string,
+"difficulty":"Easy"|"Moderate"|"Hard"|"Shop job","mobile_ok":boolean,"mobile_note":string,
+"services":[{"name":string,"labor_hours_low":number,"labor_hours_high":number,"shop_labor_low":number,"shop_labor_high":number,
+  "parts":[{"name":string,"qty":number,"unit":string,"spec":string,"oem_number":string,"search":string,"price_low":number,"price_high":number}]}],
+"tools":[string],"specs":[{"name":string,"value":string}],"steps":[{"title":string,"detail":string}],
+"warnings":[string],"related":[string],"confidence":"high"|"medium"|"low"}
+Rules:
+- "services": split the work into separate billable labor operations (e.g. "Replace front pads & rotors", "Brake fluid flush"), each with only its own parts. Don't double-count overlapping labor.
+- "labor_hours_low/high": book labor hours for that operation (flat-rate guide), range no wider than 1 hour.
+- "shop_labor_low/high": typical LABOR charge in USD (no parts) at local independent mechanic shops in Sacramento, CA (not dealerships) for that operation. Keep high − low ≤ $200.
+- Parts "qty" is a number, "unit" like "each", "set", "qt". "price_low/high" = total USD for that quantity at US retail parts stores (AutoZone/O'Reilly/RockAuto), low = good-quality aftermarket, high = premium or OEM; keep high − low realistic and ≤ $150 per line. List fluids, gaskets and one-time bolts as their own lines.
+- "summary" = 2 technical sentences. "customer_explanation" = 2–3 friendly plain-English sentences, no jargon. "customer_steps" = 3–5 short plain bullets.
+- "search" = short parts-store search phrase. "oem_number" = "" if unknown. Use 6–14 steps total.`;
+}
+async function getGuide(v, task, signal){
+  return sample.json(guidePrompt(v, task), {modelTier:"default", signal, cache:{gcTime:86400000}});
+}
+function errCopy(code){
+  return ({not_granted:"The AI wasn't allowed on this page. Reload and choose Allow.",
+    sampling_disabled:"The AI isn't available on this account.",
+    rate_limited:"Too many requests at once. Wait a minute and try again.",
+    invalid_json:"The answer came back garbled. Try again.",
+    refused:"The AI declined that request. Try rephrasing.",
+    session_expired:"Your session expired. Sign in again.",
+    image_rejected:"That photo couldn't be used. Try a smaller JPG or PNG."
+  })[code] || "Something went wrong reaching the AI. Try again.";
+}
+const noAI = () => `<div class="err">The AI assistant isn't available in this view. Call or text <b>${BIZ.phone}</b> for a quote.</div>`;
+function fillYears(sel){ const now = new Date().getFullYear()+1; for(let y=now;y>=1980;y--) sel.add(new Option(y,y)); sel.value = 2015; }
+
+// ===== CUSTOMER VIEW (lump sum) =====
+function initCustomer(){
+  fillYears($("#c-year"));
+  $("#c-chips").innerHTML = SYMPTOMS.map(s=>`<button type="button" class="chipbtn" aria-pressed="false">${esc(s)}</button>`).join("");
+  $("#c-chips").addEventListener("click", e=>{
+    const b = e.target.closest(".chipbtn"); if(!b) return;
+    b.setAttribute("aria-pressed", b.getAttribute("aria-pressed")!=="true");
+    const picked = [...document.querySelectorAll("#c-chips .chipbtn[aria-pressed=true]")].map(x=>x.textContent);
+    const free = $("#c-problem").value.split("\n").filter(l=>!SYMPTOMS.includes(l.trim())).join("\n").trim();
+    $("#c-problem").value = [...picked, free].filter(Boolean).join("\n");
+  });
+  $("#c-go").addEventListener("click", onCustomerGo);
+}
+async function onCustomerGo(){
+  const v = {year:+$("#c-year").value, make:$("#c-make").value.trim(), model:$("#c-model").value.trim()};
+  const task = $("#c-problem").value.trim();
+  if(!v.make || !v.model){ $("#c-note").innerHTML = `<span class="bad">Add your car's make and model.</span>`; return; }
+  if(!task){ $("#c-note").innerHTML = `<span class="bad">Tell us what's going on with the car.</span>`; return; }
+  const vinRaw = $("#c-vin").value.trim();
+  if(vinRaw){ const d = decodeVin(vinRaw); if(d.error){ $("#c-note").innerHTML = `<span class="bad">${esc(d.error)}</span>`; return; } v.vin = d.vin; $("#c-vin").value = d.vin; }
+  $("#c-note").textContent = "";
+  if(!sample){ $("#c-out").innerHTML = noAI(); return; }
+  cctl?.abort(); cctl = new AbortController();
+  $("#c-out").innerHTML = `<div class="status"><span class="spin"></span>Working out what's wrong with your ${esc(vName(v))}. This takes about a minute.</div>`;
+  $("#c-go").disabled = true;
+  try{ renderCustomer(await getGuide(v, task, cctl.signal), v, false); }
+  catch(e){ if(e.code!=="cancelled"){ if(e.code==="not_granted"||e.code==="sampling_disabled") disableAI(); $("#c-out").innerHTML = `<div class="err">${esc(errCopy(e.code))} Or call/text ${BIZ.phone}.</div>`; } }
+  finally{ $("#c-go").disabled = false; }
+}
+let partsBy = "us", custShown = null;
+function renderCustomer(g, v, isExample){
+  custShown = {g, v, isExample};
+  if(!isExample) last.customer = {g, v};
+  const t = price(g), us = partsBy==="us";
+  const allParts = t.svcs.flatMap(({s})=>arr(s.parts));
+  const sd = {yes:["yes","OK to drive"],caution:["caution","Drive with caution"],no:["no","Don't drive it"]}[g.safe_to_drive] || ["caution","Have it checked soon"];
+  $("#c-out").innerHTML = `
+  <div class="ro-head">
+    ${isExample?`<div class="example">Example quote · enter your car above to get yours</div>`:`<div class="eyebrow">Your quote</div>`}
+    <div class="vehiclebar">${esc(vName(v))}</div>
+    <h2>${esc(g.title)}</h2>
+    <p>${esc(g.customer_explanation||g.summary)}</p>
+  </div>
+  <div class="grid">
+    <div class="stack">
+      <section class="panel"><h3>Is it safe to drive?</h3>
+        <div class="safe ${sd[0]}"><b class="${sd[0]}">${sd[1]}</b><span>${esc(g.safety_note)}</span></div></section>
+      <section class="panel"><h3>What we'll do</h3>
+        <ul class="plain">${arr(g.customer_steps).map(s=>`<li>${esc(s)}</li>`).join("")}</ul></section>
+    </div>
+    <div class="stack">
+      <section class="panel est"><h3>Your quote</h3>
+        <div class="seg" role="group" aria-label="Who buys the parts">
+          <button type="button" data-pb="us" aria-pressed="${us}">We buy the parts</button>
+          <button type="button" data-pb="you" aria-pressed="${!us}">I'll buy my own</button>
+        </div>
+        <div class="bigprice">${us ? range(t.tl,t.th) : range(t.ol,t.oh)}</div>
+        <p class="sub" style="margin:6px 0 6px">${us ? "Parts and labor included. Sales tax on parts not included." : `Labor only. You buy the parts yourself (about ${range(t.pl,t.ph)}).`}</p>
+        <div class="paystep"><i>1</i><span>${us ? "Parts, paid up front" : "You buy the parts"}<span class="sub">${us ? "We order the exact parts using your VIN" : "Use your VIN at the parts store so they fit"}</span></span><b>${us ? range(t.pl,t.ph) : "—"}</b></div>
+        <div class="paystep"><i>2</i><span>Labor, paid after the job<span class="sub">Only once the work is done</span></span><b>${range(t.ol,t.oh)}</b></div>
+        <div class="estrow"><span>Service time<span class="sub">At your home or work</span></span><b>About ${hrs(t.hl,t.hh).replace("hr","hours")}</b></div>
+        <div class="estrow"><span>${us ? "Local mechanic shops" : "Local shop labor"}<span class="sub">Independent shops in Sacramento</span></span><b class="strike">${us ? range(t.stl,t.sth) : range(t.sl,t.sh)}</b></div>
+        ${t.pct>0?`<div style="padding-top:10px"><span class="savebadge">Our labor is ${t.pct}% less than local mechanic shops</span></div>`:""}
+        <p class="sub" style="margin-top:10px">${v.vin ? `VIN on file: <span class="mono">${esc(v.vin)}</span>. ` : "We'll need your VIN to order the exact parts. "}<b>This is a quote, not a final bill.</b> We confirm the final price after we inspect your car.</p>
+      </section>
+      ${!us && allParts.length ? `<section class="panel"><h3>Parts to buy</h3>
+        ${allParts.map(p=>`<div class="part"><div class="pn">${esc(p.name)}<span>× ${esc(p.qty||1)} ${esc(p.unit||"")}</span></div>${p.spec?`<div class="sp">${esc(p.spec)}</div>`:""}${shopLinks(v,p)}</div>`).join("")}
+        <p class="sub" style="margin-top:8px">Not sure it's the right part? Text us the part numbers and your VIN before you buy and we'll double-check.</p></section>` : ""}
+      ${ctaHTML(quoteMessage(g, v, t, us))}
+    </div>
+  </div>`;
+  bindCta($("#c-out"), quoteMessage(g, v, t, us));
+  $("#c-out").querySelectorAll("[data-pb]").forEach(b=>b.onclick=()=>{ partsBy = b.dataset.pb; renderCustomer(custShown.g, custShown.v, custShown.isExample); });
+}
+function quoteMessage(g, v, t, us){
+  const name = $("#c-name").value.trim(), phone = $("#c-phone").value.trim();
+  const problem = $("#c-problem").value.trim().replace(/\n+/g, "; ");
+  return [
+    "New quote request for Example Auto Mechanics",
+    `Name: ${name || "(not given)"}`,
+    `Phone: ${phone || "(not given)"}`,
+    `Car: ${vName(v)}`,
+    `VIN: ${v.vin || "(not given)"}`,
+    `Problem: ${problem || g.title}`,
+    `Job: ${g.title}`,
+    `Quote: ${us ? range(t.tl,t.th) : range(t.ol,t.oh) + " labor"} (${us ? "Example Auto buys parts" : "I'll buy my own parts"})`,
+    us ? `Parts up front: ${range(t.pl,t.ph)}` : `Parts I'll buy: about ${range(t.pl,t.ph)}`,
+    `Labor after the job: ${range(t.ol,t.oh)}`,
+    `Service time: about ${hrs(t.hl,t.hh).replace("hr","hours")}`
+  ].join("\n");
+}
+function ctaHTML(msg){
+  const enc = encodeURIComponent(msg);
+  return `<section class="cta"><h3>Send this quote to Example Auto</h3>
+    <p style="margin:0;opacity:.85">Tap Text or Email. Your car, VIN, problem and quote are filled in for you. Just hit send and we'll get back to you.</p>
+    <div class="acts">
+      <a class="btn primary" href="sms:+1${BIZ.phoneRaw}?&body=${enc}">Text it to us</a>
+      <a class="btn ghost" href="mailto:${BIZ.email}?subject=${encodeURIComponent("Quote request")}&body=${enc}">Email it to us</a>
+      <button class="btn ghost copymsg" type="button">Copy message</button>
+    </div>
+    <pre class="msgpreview">${esc(msg)}</pre>
+    <div class="phone">${BIZ.phone}</div>
+    <div class="acts"><a class="btn ghost" href="tel:${BIZ.phoneRaw}">Call</a><button class="btn ghost copy" type="button">Copy number</button></div>
+    <div class="mail">${BIZ.email}</div>
+    <p class="sub" style="color:inherit;opacity:.75;margin:0">If the Text button doesn't open your messages app, tap Copy message and paste it into a text to ${BIZ.phone}.</p></section>`;
+}
+function bindCta(root, msg){
+  const copy = (btn, text, el, label) => {
+    const done = ()=>{ btn.textContent="Copied"; }, fail = ()=>{ selectText(el); btn.textContent="Selected — copy it"; };
+    try{ navigator.clipboard.writeText(text).then(done, fail); }catch{ fail(); }
+  };
+  const b = root.querySelector(".copy"); if(b) b.addEventListener("click", ()=>copy(b, BIZ.phone, root.querySelector(".phone")));
+  const m = root.querySelector(".copymsg"); if(m && msg) m.addEventListener("click", ()=>copy(m, msg, root.querySelector(".msgpreview")));
+}
+function selectText(el){ const r=document.createRange(); r.selectNodeContents(el); const s=getSelection(); s.removeAllRanges(); s.addRange(r); }
+
+// ===== SHOP VIEW =====
+function initShop(){
+  fillYears($("#year"));
+  $("#jobs").innerHTML = JOBS.map(j=>`<button type="button" class="chipbtn" aria-pressed="${jobs.has(j)}">${esc(j)}</button>`).join("");
+  $("#jobs").addEventListener("click",e=>{
+    const b = e.target.closest(".chipbtn"); if(!b) return;
+    const j = b.textContent;
+    if(jobs.has(j)) jobs.delete(j); else jobs.add(j);
+    b.setAttribute("aria-pressed", jobs.has(j));
+  });
+  ["tab-vin","tab-ymm"].forEach(id=>$("#"+id).addEventListener("click",()=>setMode(id==="tab-vin"?"vin":"ymm")));
+  $("#vin").addEventListener("input",()=>{ vehicle=null; $("#vinout").textContent=""; });
+  $("#decode").addEventListener("click",onDecode);
+  $("#go").addEventListener("click",onShopGo);
+  $("#photoBtn").addEventListener("click",()=>$("#photo").click());
+  $("#photo").addEventListener("change",onPhoto);
+  renderRecent();
+}
+function setJobs(list){
+  jobs = new Set(list);
+  document.querySelectorAll("#jobs .chipbtn").forEach(x=>x.setAttribute("aria-pressed", jobs.has(x.textContent)));
+}
+function setMode(m){
+  mode = m;
+  $("#tab-vin").setAttribute("aria-selected", m==="vin");
+  $("#tab-ymm").setAttribute("aria-selected", m==="ymm");
+  $("#pane-vin").hidden = m!=="vin"; $("#pane-ymm").hidden = m!=="ymm";
+  $("#vinout").textContent = "";
+}
+function showVehicle(v, note){
+  $("#vinout").innerHTML = `<span class="${v.checkOk===false?'bad':'good'}">${v.checkOk===false?'Check digit does not match — re-check the VIN.':'VIN valid.'}</span> <b>${esc(vName(v))||'Unknown make'}</b>${note?` · ${esc(note)}`:""}`;
+}
+function prefillYmm(v){
+  if(v.year) $("#year").value = v.year;
+  if(v.make) $("#make").value = v.make;
+  if(v.model) $("#model").value = v.model;
+  if(v.engine) $("#engine").value = v.engine;
+}
+async function onDecode(){
+  const d = decodeVin($("#vin").value);
+  if(d.error){ $("#vinout").innerHTML = `<span class="bad">${esc(d.error)}</span>`; return; }
+  vehicle = {...d}; $("#vin").value = d.vin;
+  showVehicle(vehicle, sample ? "Looking up model and engine…" : "Add model and engine on the Year / Make / Model tab.");
+  if(!sample) return prefillYmm(vehicle);
+  $("#decode").disabled = true;
+  try{
+    const r = await sample.json(
+      `Decode this VIN as accurately as you can (any make, including European and exotic). VIN: ${d.vin}. Locally decoded: model year ${d.year}, manufacturer ${d.make||"unknown"}.
+Reply with only JSON: {"year":number,"make":string,"model":string,"trim":string,"engine":string,"drive":string,"confidence":"high"|"medium"|"low"}. Use "" for anything you cannot determine.`,
+      {modelTier:"quick", cache:{gcTime:86400000}});
+    vehicle = {...vehicle, year:r.year||vehicle.year, make:r.make||vehicle.make, model:r.model||"", engine:[r.engine,r.drive].filter(Boolean).join(" "), trim:r.trim||""};
+    showVehicle(vehicle, r.confidence==="high" ? "" : "Model/engine are a best guess — confirm on the door-jamb or emissions label.");
+  }catch(e){
+    if(e.code==="not_granted"||e.code==="sampling_disabled") disableAI();
+    showVehicle(vehicle, "Add model and engine on the Year / Make / Model tab.");
+  }finally{ $("#decode").disabled = false; prefillYmm(vehicle); }
+}
+async function onPhoto(e){
+  const f = e.target.files[0]; e.target.value = "";
+  if(!f || !sample) return;
+  $("#vinout").innerHTML = `Reading VIN from photo…`;
+  try{
+    const r = await sample.json(`This photo shows a vehicle VIN (dash plate, door-jamb sticker, title or registration). Read the 17-character VIN exactly. VINs never contain I, O or Q. Reply with only JSON: {"vin":string} or {"vin":""} if unreadable.`, {images:f});
+    if(!r.vin){ $("#vinout").innerHTML = `<span class="bad">Couldn't read a VIN in that photo. Try a closer, glare-free shot.</span>`; return; }
+    $("#vin").value = r.vin; onDecode();
+  }catch(err){ $("#vinout").innerHTML = `<span class="bad">${esc(errCopy(err.code))}</span>`; }
+}
+function currentVehicle(){
+  if(mode==="vin"){
+    if(!vehicle){ const d = decodeVin($("#vin").value); if(d.error) return {error:d.error}; vehicle = d; }
+    return {...vehicle, model: vehicle.model || $("#model").value.trim(), engine: vehicle.engine || $("#engine").value.trim()};
+  }
+  const v = {year:+$("#year").value, make:$("#make").value.trim(), model:$("#model").value.trim(), engine:$("#engine").value.trim()};
+  if(!v.make || !v.model) return {error:"Enter at least the make and model."};
+  return v;
+}
+async function onShopGo(){
+  const v = currentVehicle();
+  if(v.error){ $("#vinout").innerHTML = `<span class="bad">${esc(v.error)}</span>`; return; }
+  const task = [[...jobs].join(" + "), $("#symptom").value.trim()].filter(Boolean).join(" — ");
+  if(!task){ $("#vinout").innerHTML = `<span class="bad">Pick a job or describe the problem.</span>`; return; }
+  if(!sample){ $("#s-out").innerHTML = noAI(); return; }
+  ctl?.abort(); ctl = new AbortController();
+  saveRecent({v, task, jobs:[...jobs], sym:$("#symptom").value.trim()});
+  $("#s-out").innerHTML = `<div class="status"><span class="spin"></span>Building the repair guide for <b>${esc(vName(v))}</b> — usually 20–60 seconds. <button class="btn ghost small" id="stop" type="button">Stop</button></div>`;
+  $("#invoice").hidden = true;
+  $("#stop").onclick = () => ctl.abort();
+  $("#go").disabled = true;
+  try{ renderShop(await getGuide(v, task, ctl.signal), v, false); }
+  catch(e){
+    if(e.code==="cancelled") $("#s-out").innerHTML = `<div class="status">Stopped.</div>`;
+    else { if(e.code==="not_granted"||e.code==="sampling_disabled") disableAI(); $("#s-out").innerHTML = `<div class="err">${esc(errCopy(e.code))}</div>`; }
+  }finally{ $("#go").disabled = false; }
+}
+function shopLinks(v, p){
+  const q = encodeURIComponent(`${v.year||""} ${v.make||""} ${v.model||""} ${p.search||p.name}`.trim());
+  const mk = String(v.make||"").toLowerCase().split("/")[0].replace(/\s+/g,"+");
+  const ra = [v.make,v.year,v.model].every(Boolean)
+    ? `https://www.rockauto.com/en/catalog/${encodeURIComponent(mk).replace(/%2B/g,"+")},${v.year},${encodeURIComponent(String(v.model).toLowerCase()).replace(/%20/g,"+")}`
+    : `https://www.rockauto.com/`;
+  return `<div class="buy">
+    <a href="https://www.autozone.com/searchresult?searchText=${q}" target="_blank" rel="noopener">AutoZone</a>
+    <a href="https://www.oreillyauto.com/search?q=${q}" target="_blank" rel="noopener">O'Reilly</a>
+    <a href="${ra}" target="_blank" rel="noopener">RockAuto</a>
+    <a href="https://www.amazon.com/s?k=${q}" target="_blank" rel="noopener">Amazon</a></div>`;
+}
+function renderShop(g, v, isExample){
+  last.shop = {g, v};
+  const t = price(g);
+  const diffCls = {Easy:"ok",Moderate:"warn",Hard:"bad","Shop job":"bad"}[g.difficulty]||"";
+  const confCls = {high:"ok",medium:"warn",low:"bad"}[g.confidence]||"";
+  const recall = v.vin ? `https://www.nhtsa.gov/recalls?vin=${v.vin}` : `https://www.nhtsa.gov/vehicle/${v.year}/${encodeURIComponent(String(v.make).toUpperCase())}/${encodeURIComponent(String(v.model).toUpperCase())}`;
+  const many = t.svcs.length > 1;
+  $("#s-out").innerHTML = `
+  <div class="ro-head">
+    ${isExample?`<div class="example">Example guide · pick a vehicle and job above to run your own</div>`:`<div class="eyebrow">Repair guide</div>`}
+    <div class="vehiclebar">${esc(vName(v))}${v.vin?`<span class="tag">${esc(v.vin)}</span>`:""}</div>
+    <h2>${esc(g.title)}</h2>
+    <p>${esc(g.summary)}</p>
+    <div class="meta">
+      ${g.difficulty?`<span class="pill ${diffCls}">${esc(g.difficulty)}</span>`:""}
+      <span class="pill">Service time ${hrs(t.hl,t.hh)}</span>
+      <span class="pill ${g.mobile_ok?'ok':'bad'}">${g.mobile_ok?'Doable mobile':'Needs a shop'}</span>
+      ${g.confidence?`<span class="pill ${confCls}">Data confidence: ${esc(g.confidence)}</span>`:""}
+    </div>
+    ${g.mobile_note?`<p>${esc(g.mobile_note)}</p>`:""}
+  </div>
+  <section class="panel est" style="margin-bottom:20px"><h3>Quote by service · labor $${BIZ.laborRateLow}/hr</h3>
+    <div class="tablewrap"><table class="svc">
+      <thead><tr><th>Service</th><th class="n">Time</th><th class="n">Local shop labor</th><th class="n">Our labor</th><th class="n">Parts</th></tr></thead>
+      <tbody>${t.svcs.map(({s,p})=>`<tr><td>${esc(s.name)}</td><td class="n" data-label="Time">${hrs(p.hl,p.hh)}</td><td class="n" data-label="Local shop labor">${range(p.sl,p.sh)}</td><td class="n" data-label="Our labor">${range(p.ol,p.oh)}</td><td class="n" data-label="Parts">${range(p.pl,p.ph)}</td></tr>`).join("")}</tbody>
+      <tfoot><tr><td>Totals</td><td class="n" data-label="Time">${hrs(t.hl,t.hh)}</td><td class="n" data-label="Local shop labor">${range(t.sl,t.sh)}</td><td class="n" data-label="Our labor">${range(t.ol,t.oh)}</td><td class="n" data-label="Parts">${range(t.pl,t.ph)}</td></tr></tfoot>
+    </table></div>
+    <div class="estrow"><span>Due up front<span class="sub">Parts (if we buy them)</span></span><b>${range(t.pl,t.ph)}</b></div>
+    <div class="estrow"><span>Due after the job<span class="sub">Labor</span></span><b>${range(t.ol,t.oh)}</b></div>
+    <div class="estrow total"><span>Customer total</span><b>${range(t.tl,t.th)}</b></div>
+    ${t.pct>0?`<span class="savebadge">${t.pct}% below local mechanic shops</span>`:""}
+  </section>
+  <div class="grid">
+    <section class="panel"><h3>Procedure</h3>
+      <ol class="steps">${arr(g.steps).map(s=>`<li><div><b>${esc(s.title)}</b><p>${esc(s.detail)}</p></div></li>`).join("")}</ol>
+    </section>
+    <div class="stack">
+      <section class="panel"><h3>Parts to buy</h3>
+        ${t.svcs.map(({s})=>`${many?`<div class="svchead">${esc(s.name)}</div>`:""}${arr(s.parts).map(p=>`<div class="part"><div class="pn">${esc(p.name)}<span>× ${esc(p.qty||1)} ${esc(p.unit||"")}${(+p.price_low)?` · <span class="price">${range(...tight(+p.price_low, +p.price_high||+p.price_low, 150))}</span>`:""}</span></div>
+          ${p.spec||p.oem_number?`<div class="sp">${esc(p.spec)}${p.oem_number?` · OEM <span class="mono">${esc(p.oem_number)}</span>`:""}</div>`:""}
+          ${shopLinks(v,p)}</div>`).join("")||`<p class="sub">No parts for this service.</p>`}`).join("")}
+      </section>
+      ${arr(g.specs).length?`<section class="panel"><h3>Specs</h3><table class="specs"><tbody>${arr(g.specs).map(s=>`<tr><td>${esc(s.name)}</td><td>${esc(s.value)}</td></tr>`).join("")}</tbody></table></section>`:""}
+      ${arr(g.tools).length?`<section class="panel"><h3>Tools</h3><ul class="plain">${arr(g.tools).map(x=>`<li>${esc(x)}</li>`).join("")}</ul></section>`:""}
+      ${arr(g.warnings).length?`<section class="panel warnbox"><h3>Watch out</h3><ul class="plain">${arr(g.warnings).map(x=>`<li>${esc(x)}</li>`).join("")}</ul></section>`:""}
+      <section class="panel"><h3>Check before you quote</h3>
+        <a href="${recall}" target="_blank" rel="noopener">Open recalls (NHTSA)</a>
+        ${arr(g.related).length?`<p class="sp" style="margin:10px 0 0">Often done together: ${arr(g.related).map(esc).join(", ")}</p>`:""}
+      </section>
+    </div>
+  </div>
+  <p class="fine">Guides, prices and labor times are AI estimates. Confirm torque specs, part fitment and current prices with OEM service information or the parts store before quoting.</p>`;
+  buildInvoice(g, v, t);
+}
+
+// ===== INVOICE =====
+let inv = null;
+function invNumber(){ const d=new Date(); const p=n=>String(n).padStart(2,"0"); return `EX-${String(d.getFullYear()).slice(2)}${p(d.getMonth()+1)}${p(d.getDate())}-${Math.floor(100+Math.random()*900)}`; }
+function buildInvoice(g, v, t){
+  const lines = [];
+  t.svcs.forEach(({s,p})=>{
+    const h = +fh((p.hl+p.hh)/2) || 1;
+    lines.push({type:"Labor", desc:`Labor — ${s.name}`, qty:h, rate:Math.round(((p.ol+p.oh)/2/h)*100)/100});
+    arr(s.parts).forEach(pt=>{
+      const q = +pt.qty || 1; const [lo,hi] = tight(+pt.price_low||0, +pt.price_high||+pt.price_low||0, 150);
+      lines.push({type:"Part", desc:[pt.name, pt.oem_number?`(${pt.oem_number})`:""].filter(Boolean).join(" "), qty:q, rate:Math.round(((lo+hi)/2/q)*100)/100});
+    });
+  });
+  const keep = inv ? {name:inv.name, phone:inv.phone, address:inv.address} : {name:"",phone:"",address:""};
+  inv = {...keep, number:invNumber(), date:new Date().toISOString().slice(0,10), vehicle:vName(v), vin:v.vin||"", mileage:"", tax:BIZ.partsTax, partsBy:"Example Auto", paid:0, docType:"Quote",
+    notes:"Parts are paid up front. Labor is due when the job is complete. Parts warranty per manufacturer. Thank you for choosing Example Auto Mechanics.", lines};
+  renderInvoice();
+}
+const custParts = () => inv.partsBy==="Customer";
+function lineAmt(l){ return (l.type==="Part" && custParts()) ? 0 : (+l.qty||0)*(+l.rate||0); }
+function lineAmtText(l){ return (l.type==="Part" && custParts()) ? "Customer supplied" : money2(lineAmt(l)); }
+function invTotals(){
+  let parts=0, labor=0;
+  inv.lines.forEach(l=>{ const a=lineAmt(l); if(l.type==="Part") parts+=a; else labor+=a; });
+  const tax = parts*(+inv.tax||0)/100, total = parts+labor+tax, paid = +inv.paid||0;
+  return {parts, labor, tax, total, paid, balance: total-paid};
+}
+function renderInvoice(){
+  const el = $("#invoice"); el.hidden = view!=="shop";
+  el.innerHTML = `
+  <div class="invhead"><div><h3>Quote / Invoice</h3><p class="sub">Send it as a quote before the job, switch to Invoice when you finish, then download a print-ready PDF.</p></div>
+    <div class="row"><button class="btn primary" id="invPdf" type="button">Download PDF</button></div></div>
+  <div class="invgrid">
+    <div class="field"><label for="i-name">Customer name</label><input id="i-name" data-f="name" value="${esc(inv.name)}"></div>
+    <div class="field"><label for="i-phone">Phone</label><input id="i-phone" data-f="phone" value="${esc(inv.phone)}"></div>
+    <div class="field"><label for="i-address">Service address</label><input id="i-address" data-f="address" value="${esc(inv.address)}"></div>
+    <div class="field"><label for="i-number">Invoice #</label><input id="i-number" data-f="number" value="${esc(inv.number)}"></div>
+    <div class="field"><label for="i-date">Date</label><input id="i-date" type="date" data-f="date" value="${esc(inv.date)}"></div>
+    <div class="field"><label for="i-vehicle">Vehicle</label><input id="i-vehicle" data-f="vehicle" value="${esc(inv.vehicle)}"></div>
+    <div class="field"><label for="i-vin">VIN</label><input id="i-vin" data-f="vin" value="${esc(inv.vin)}" class="mono"></div>
+    <div class="field"><label for="i-mileage">Mileage</label><input id="i-mileage" data-f="mileage" inputmode="numeric" value="${esc(inv.mileage)}"></div>
+    <div class="field"><label for="i-doctype">Document</label><select id="i-doctype" data-f="docType"><option${inv.docType==="Quote"?" selected":""}>Quote</option><option${inv.docType==="Invoice"?" selected":""}>Invoice</option></select></div>
+    <div class="field"><label for="i-partsby">Parts supplied by</label><select id="i-partsby" data-f="partsBy"><option${inv.partsBy==="Example Auto"?" selected":""}>Example Auto</option><option${inv.partsBy==="Customer"?" selected":""}>Customer</option></select></div>
+  </div>
+  <div class="tablewrap"><table class="inv">
+    <thead><tr><th style="width:96px">Type</th><th>Description</th><th style="width:96px">Qty / Hrs</th><th style="width:104px">Rate</th><th style="width:100px;text-align:right">Amount</th><th style="width:36px"></th></tr></thead>
+    <tbody id="invRows">${inv.lines.map((l,i)=>`<tr>
+      <td><select data-i="${i}" data-k="type" aria-label="Type"><option${l.type==="Labor"?" selected":""}>Labor</option><option${l.type==="Part"?" selected":""}>Part</option><option${l.type==="Fee"?" selected":""}>Fee</option></select></td>
+      <td><input data-i="${i}" data-k="desc" value="${esc(l.desc)}" aria-label="Description"></td>
+      <td><input class="num" data-i="${i}" data-k="qty" type="number" step="0.1" min="0" value="${l.qty}" aria-label="Quantity or hours"></td>
+      <td><input class="num" data-i="${i}" data-k="rate" type="number" step="0.01" min="0" value="${l.rate}" aria-label="Rate"></td>
+      <td class="amt" id="amt-${i}">${lineAmtText(l)}</td>
+      <td><button class="x" type="button" data-del="${i}" aria-label="Remove line">×</button></td></tr>`).join("")}</tbody>
+  </table></div>
+  <div class="row" style="margin-top:8px">
+    <button class="btn ghost small" type="button" data-add="Labor">+ Labor</button>
+    <button class="btn ghost small" type="button" data-add="Part">+ Part</button>
+    <button class="btn ghost small" type="button" data-add="Fee">+ Fee</button>
+  </div>
+  <div class="invfoot">
+    <div class="field" style="flex:1 1 280px"><label for="i-notes">Notes</label><textarea id="i-notes" data-f="notes">${esc(inv.notes)}</textarea></div>
+    <div class="invtot">
+      <div class="estrow"><span>Parts</span><b id="t-parts"></b></div>
+      <div class="estrow"><span>Labor &amp; fees</span><b id="t-labor"></b></div>
+      <div class="estrow"><span>Tax on parts <input id="i-tax" type="number" step="0.01" min="0" value="${inv.tax}" aria-label="Parts tax percent">%</span><b id="t-tax"></b></div>
+      <div class="estrow"><span>Total</span><b id="t-total"></b></div>
+      <div class="estrow"><span>Paid up front $<input id="i-paid" type="number" step="0.01" min="0" value="${inv.paid||0}" aria-label="Amount paid up front"> <button class="btn ghost small" id="paidParts" type="button">Parts paid</button></span><b id="t-paid"></b></div>
+      <div class="estrow total"><span>Balance due</span><b id="t-bal"></b></div>
+    </div>
+  </div>
+  <p class="note" id="invMsg" aria-live="polite"></p>`;
+  paintInvTotals();
+  el.oninput = e => {
+    const f = e.target.dataset.f, i = e.target.dataset.i, k = e.target.dataset.k;
+    if(f==="partsBy"){ inv.partsBy = e.target.value; if(custParts()) inv.paid = 0; renderInvoice(); return; }
+    if(f){ inv[f] = e.target.value; return; }
+    if(e.target.id==="i-tax"){ inv.tax = e.target.value; paintInvTotals(); return; }
+    if(e.target.id==="i-paid"){ inv.paid = e.target.value; paintInvTotals(); return; }
+    if(i!==undefined){ inv.lines[+i][k] = e.target.value;
+      $("#amt-"+i).textContent = lineAmtText(inv.lines[+i]); paintInvTotals(); }
+  };
+  el.onchange = e => { const f=e.target.dataset.f; if(e.target.dataset.k==="type" || f==="partsBy" || f==="docType") el.oninput(e); };
+  el.onclick = e => {
+    const d = e.target.dataset;
+    if(e.target.id==="paidParts"){ const t = invTotals(); inv.paid = Math.round((t.parts+t.tax)*100)/100; $("#i-paid").value = inv.paid; paintInvTotals(); return; }
+    if(d.del!==undefined){ inv.lines.splice(+d.del,1); renderInvoice(); }
+    else if(d.add){ inv.lines.push({type:d.add, desc:d.add==="Labor"?"Labor — ":"", qty:1, rate:d.add==="Labor"?BIZ.manualLaborRate:0}); renderInvoice(); }
+    else if(e.target.id==="invPdf") downloadInvoice();
+  };
+}
+function paintInvTotals(){
+  const t = invTotals();
+  $("#t-parts").textContent = custParts() ? "Customer supplied" : money2(t.parts);
+  $("#t-labor").textContent = money2(t.labor);
+  $("#t-tax").textContent = money2(t.tax);
+  $("#t-total").textContent = money2(t.total);
+  $("#t-paid").textContent = "−" + money2(t.paid);
+  $("#t-bal").textContent = money2(t.balance);
+}
+async function downloadInvoice(){
+  const msg = $("#invMsg");
+
+  let data, filename;
+  const t = invTotals();
+  if(window.jspdf?.jsPDF){
+    const {jsPDF} = window.jspdf; const doc = new jsPDF({unit:"pt", format:"letter"});
+    const W = doc.internal.pageSize.getWidth();
+    doc.setFillColor(22,48,90); doc.rect(0,0,W,72,"F"); doc.setFillColor(226,96,15); doc.rect(0,72,W,4,"F");
+    doc.setTextColor(255,255,255); doc.setFont("helvetica","bold"); doc.setFontSize(20); doc.text("EXAMPLE AUTO MECHANICS",40,36);
+    doc.setFont("helvetica","normal"); doc.setFontSize(9); doc.text(`Mobile Mechanic · ${BIZ.area} · ${BIZ.phone} · ${BIZ.email}`,40,54);
+    doc.setFont("helvetica","bold"); doc.setFontSize(18); doc.text(String(inv.docType||"Invoice").toUpperCase(), W-40, 36, {align:"right"});
+    doc.setFont("helvetica","normal"); doc.setFontSize(9); doc.text(`No. ${inv.number}   ·   ${inv.date}`, W-40, 54, {align:"right"});
+    doc.setTextColor(15,28,51);
+    let y = 104;
+    doc.setFont("helvetica","bold"); doc.setFontSize(9); doc.text("BILL TO",40,y); doc.text("VEHICLE",W/2,y);
+    doc.setFont("helvetica","normal"); doc.setFontSize(10);
+    const left = [inv.name, inv.phone, inv.address].filter(Boolean);
+    const right = [inv.vehicle, inv.vin?`VIN ${inv.vin}`:"", inv.mileage?`Mileage ${inv.mileage}`:""].filter(Boolean);
+    left.forEach((s,i)=>doc.text(doc.splitTextToSize(s, W/2-60), 40, y+16+i*14));
+    right.forEach((s,i)=>doc.text(doc.splitTextToSize(s, W/2-40), W/2, y+16+i*14));
+    y += 24 + Math.max(left.length,right.length,1)*14;
+    doc.autoTable({startY:y, margin:{left:40,right:40},
+      head:[["Description","Type","Qty / Hrs","Rate","Amount"]],
+      body: inv.lines.map(l=>[l.desc, l.type, String(l.qty), (l.type==="Part"&&custParts())?"—":money2(+l.rate||0), lineAmtText(l)]),
+      styles:{fontSize:9, cellPadding:6}, headStyles:{fillColor:[22,48,90], textColor:255},
+      columnStyles:{2:{halign:"right"},3:{halign:"right"},4:{halign:"right"}}});
+    y = doc.lastAutoTable.finalY + 18;
+    const rows = [["Parts", custParts()?"Customer supplied":money2(t.parts)],["Labor & fees",money2(t.labor)],[`Tax on parts (${inv.tax}%)`,money2(t.tax)],["Total",money2(t.total)],["Paid up front","−"+money2(t.paid)]];
+    doc.setFontSize(10);
+    rows.forEach(([k,val])=>{ doc.text(k, W-220, y); doc.text(val, W-40, y, {align:"right"}); y+=16; });
+    doc.setDrawColor(226,96,15); doc.line(W-220, y-8, W-40, y-8);
+    doc.setFont("helvetica","bold"); doc.setFontSize(13); doc.text("BALANCE DUE", W-220, y+8); doc.text(money2(t.balance), W-40, y+8, {align:"right"});
+    if(inv.notes){ doc.setFont("helvetica","normal"); doc.setFontSize(9); doc.setTextColor(91,104,128); doc.text(doc.splitTextToSize(inv.notes, W/2-40), 40, y+8); }
+    if(inv.docType==="Quote"){ doc.setFont("helvetica","italic"); doc.setFontSize(9); doc.setTextColor(91,104,128); doc.text("This is a quote, not a final bill. Final price is confirmed after inspection.", 40, doc.internal.pageSize.getHeight()-40); }
+    data = doc.output("blob"); filename = `${inv.docType==="Quote"?"Quote":"Invoice"}-${inv.number}.pdf`;
+  } else {
+    data = invoiceHTML(t); filename = `${inv.docType==="Quote"?"Quote":"Invoice"}-${inv.number}.html`;
+  }
+  msg.textContent = "Saving…";
+  if(!downloads){ const a=document.createElement("a"); a.href=URL.createObjectURL(data instanceof Blob?data:new Blob([data],{type:"text/html"})); a.download=filename; document.body.appendChild(a); a.click(); a.remove(); msg.textContent=`Saved ${filename}.`; return; }
+  try{ await downloads.save({filename, data}); msg.textContent = `Saved ${filename}. Open it to print or text it to the customer.`; }
+  catch(e){ msg.textContent = e.code==="cancelled"||e.code==="declined" ? "Download cancelled." : "Couldn't save the file. Try again."; }
+}
+function invoiceHTML(t){
+  return `<!doctype html><meta charset="utf-8"><title>${esc(inv.number)}</title><body style="font-family:Arial,sans-serif;max-width:760px;margin:24px auto;color:#0f1c33">
+  <div style="background:#16305a;color:#fff;padding:16px;border-bottom:4px solid #e2600f"><b style="font-size:20px">EXAMPLE AUTO MECHANICS</b><div style="font-size:12px">${esc(BIZ.phone)} · ${esc(BIZ.email)}</div><div style="float:right;margin-top:-34px;text-align:right"><b>${esc(String(inv.docType||"Invoice").toUpperCase())}</b><br>${esc(inv.number)} · ${esc(inv.date)}</div></div>
+  <p><b>Bill to:</b> ${esc(inv.name)} ${esc(inv.phone)} ${esc(inv.address)}<br><b>Vehicle:</b> ${esc(inv.vehicle)} ${inv.vin?`· VIN ${esc(inv.vin)}`:""} ${inv.mileage?`· ${esc(inv.mileage)} mi`:""}</p>
+  <table style="width:100%;border-collapse:collapse" border="1" cellpadding="6"><tr style="background:#16305a;color:#fff"><th>Description</th><th>Type</th><th>Qty/Hrs</th><th>Rate</th><th>Amount</th></tr>
+  ${inv.lines.map(l=>`<tr><td>${esc(l.desc)}</td><td>${esc(l.type)}</td><td align="right">${esc(l.qty)}</td><td align="right">${(l.type==="Part"&&custParts())?"—":money2(+l.rate||0)}</td><td align="right">${lineAmtText(l)}</td></tr>`).join("")}</table>
+  <p style="text-align:right">Parts ${custParts()?"Customer supplied":money2(t.parts)}<br>Labor &amp; fees ${money2(t.labor)}<br>Tax on parts (${esc(inv.tax)}%) ${money2(t.tax)}<br>Total ${money2(t.total)}<br>Paid up front −${money2(t.paid)}<br><b style="font-size:18px">Balance due ${money2(t.balance)}</b></p><p style="color:#5b6880">${esc(inv.notes)}</p></body>`;
+}
+
+// ===== recent (per device) =====
+function loadRecent(){ try{ return JSON.parse(localStorage.getItem("pt-recent")||"[]"); }catch{ return []; } }
+function saveRecent(item){
+  const list = [item, ...loadRecent().filter(r=>!(vName(r.v)===vName(item.v) && r.task===item.task))].slice(0,6);
+  try{ localStorage.setItem("pt-recent", JSON.stringify(list)); }catch{}
+  renderRecent();
+}
+function renderRecent(){
+  const list = loadRecent(); const el = $("#recent");
+  el.hidden = !list.length;
+  el.innerHTML = "Recent:" + list.map((r,i)=>`<button type="button" data-i="${i}">${esc(vName(r.v))} · ${esc(String(r.task).split(" — ")[0])}</button>`).join("");
+  el.onclick = e => {
+    const b = e.target.closest("button"); if(!b) return;
+    const r = loadRecent()[+b.dataset.i]; if(!r) return;
+    setMode("ymm"); prefillYmm(r.v); vehicle = null;
+    setJobs(arr(r.jobs).filter(j=>JOBS.includes(j)));
+    $("#symptom").value = r.sym ?? (r.jobs ? "" : r.task);
+    onShopGo();
+  };
+}
+
+// ===== AI CHAT =====
+const chats = { customer: [], shop: [] };
+let chatCtl = null;
+const STARTERS = {
+  customer: ["Is it safe to drive with my check engine light on?","How much is an oil change for my car?","Do you come to my work?","My car won't start. What could it be?"],
+  shop: ["Draft a text quote for this customer","Torque specs for this job","What else should I inspect while I'm in there?","Walk me through diagnosing a P0171"]
+};
+function rulesFor(which){
+  const ctx = last[which] ? (()=>{ const {g,v} = last[which]; const t = price(g);
+    return `\nCurrently on screen: ${vName(v)} — ${g.title}. Estimated total ${range(t.tl,t.th)} (parts ${range(t.pl,t.ph)}, our labor ${range(t.ol,t.oh)}), service time ${hrs(t.hl,t.hh)}, local mechanic shop price ${range(t.stl,t.sth)}.`; })() : "";
+  const rule = `Our labor rate is $${BIZ.laborRateLow} per book hour, below what local independent mechanic shops in Sacramento charge; parts are separate and billed at normal retail prices. Keep any price range within $${BIZ.maxSpread}. Only compare to local independent mechanic shops in Sacramento; never cite AAA, national averages or dealerships. Every price is a quote until we inspect the car.
+Payment: parts are paid up front, before the job. We can buy the parts (we need the customer's VIN, year, make and model to order the exact parts), or the customer can buy their own parts. Labor is paid after the job is complete.`;
+  if(which==="customer") return `You are the friendly AI assistant on the website of ${BIZ.name}, a budget-friendly mobile mechanic serving ${BIZ.area}. We drive to the customer's home or work. Services: ${BIZ.services}. We work on all makes, including European and luxury cars.
+Pricing: ${rule} With customers, give ONE estimated total range (parts + labor) and how long the service takes; you may say what percent our labor is below local mechanic shops. Always call it a quote and say the final price is confirmed after we see the car. Never promise an exact price.
+Booking: customers call or text ${BIZ.phone} or email ${BIZ.email}. You cannot book or check the schedule yourself; tell them to call or text.
+Safety first: if brakes are failing, there is smoke, a fuel smell, overheating, or a flashing check-engine light, tell them not to drive and to call us.
+Keep answers short (under 120 words), warm and plain English. Plain text only, no markdown symbols. Our customers are budget-minded: suggest the most cost-effective reliable fix first and never push unneeded add-ons. Don't give risky DIY instructions; simple checks (fluid levels, tire pressure) are fine.${ctx}`;
+  return `You are the technical assistant for the mechanics at ${BIZ.name}, a budget-friendly mobile mechanic in ${BIZ.area} (driveway work, no lift). Be direct and specific: procedures, diagnostic flows, torque specs, fluid capacities, parts, common failures and labor times, for all makes including European and exotic. Flag any spec you are not sure of with "verify in service info".
+Company pricing: ${rule} When asked for a quote, itemize each service's labor (book hours × $${BIZ.laborRateLow}/hr) and each part separately. When asked for a customer text, give one total range and the service time, keep it short and friendly, and sign it ${BIZ.name}, ${BIZ.phone}.
+Plain text only, short paragraphs or "-" lists, no markdown headers or bold.${ctx}`;
+}
+function openChat(){
+  $("#chat").hidden = false; $("#shade").hidden = false; $("#fab").hidden = true;
+  $("#chatTitle").textContent = view==="customer" ? "Example Auto Assistant" : "Tech Assist";
+  $("#chatSub").textContent = view==="customer" ? "Ask about your car, prices or booking" : "Procedures, specs, diagnosis and quotes";
+  renderMsgs(); setTimeout(()=>$("#chatIn").focus(), 50);
+}
+function closeChat(){ $("#chat").hidden = true; $("#shade").hidden = true; $("#fab").hidden = !sample; }
+function renderMsgs(){
+  const list = chats[view]; const box = $("#msgs");
+  if(!list.length){
+    box.innerHTML = `<div class="msg ai">${view==="customer" ? `Hi! I'm the Example Auto assistant. Ask me anything about your car, what a repair might cost, or how our mobile service works.` : `Tech assist is ready${last.shop?` with the ${esc(vName(last.shop.v))} job loaded`:""}. Ask for specs, diagnostics, or a customer quote.`}</div>
+      <div class="starters">${STARTERS[view].map(s=>`<button type="button">${esc(s)}</button>`).join("")}</div>`;
+    box.querySelectorAll(".starters button").forEach(b=>b.onclick=()=>send(b.textContent));
+    return;
+  }
+  box.innerHTML = list.map(m=>`<div class="msg ${m.role==="user"?"user":"ai"}">${esc(m.content)}</div>`).join("");
+  box.scrollTop = box.scrollHeight;
+}
+async function send(text){
+  text = text.trim(); if(!text || !sample) return;
+  const which = view; const list = chats[which];
+  list.push({role:"user", content:text});
+  renderMsgs(); $("#chatIn").value = "";
+  const box = $("#msgs");
+  const bubble = document.createElement("div"); bubble.className = "msg ai"; bubble.textContent = "Thinking…";
+  box.append(bubble); box.scrollTop = box.scrollHeight;
+  chatCtl?.abort(); chatCtl = new AbortController();
+  const btn = $("#chatSend"); btn.textContent = "Stop"; btn.type = "button"; btn.onclick = () => chatCtl.abort();
+  try{
+    const turns = [{role:"user", content: rulesFor(which)}, ...list.slice(-16)];
+    const { text: answer } = await sample(turns, {cache:false, signal:chatCtl.signal, modelTier: which==="customer" ? "quick" : "default",
+      onText: ({text}) => { bubble.textContent = text; box.scrollTop = box.scrollHeight; }});
+    list.push({role:"assistant", content: answer});
+  }catch(e){
+    if(e.text){ list.push({role:"assistant", content:e.text}); } else { list.pop(); }
+    if(e.code==="not_granted"||e.code==="sampling_disabled") disableAI();
+    renderMsgs();
+    if(e.code!=="cancelled"){ const n = document.createElement("div"); n.className="msg sys"; n.textContent = errCopy(e.code); box.append(n); }
+  }finally{ btn.textContent = "Send"; btn.type = "submit"; btn.onclick = null; }
+}
+function initChat(){
+  $("#fab").onclick = openChat; $("#chatClose").onclick = closeChat; $("#shade").onclick = closeChat;
+  $("#compose").addEventListener("submit", e=>{ e.preventDefault(); send($("#chatIn").value); });
+  $("#chatIn").addEventListener("keydown", e=>{ if(e.key==="Enter" && !e.shiftKey){ e.preventDefault(); send($("#chatIn").value); } });
+  document.addEventListener("keydown", e=>{ if(e.key==="Escape" && !$("#chat").hidden) closeChat(); });
+}
+
+// ===== views & AI availability =====
+function setView(v){
+  view = v;
+  $("#c-form").hidden = v!=="customer"; $("#c-out").hidden = v!=="customer";
+  $("#s-form").hidden = v!=="shop";     $("#s-out").hidden = v!=="shop";
+  $("#invoice").hidden = v!=="shop" || !inv;
+  document.querySelectorAll("#viewswitch button").forEach(b=>b.setAttribute("aria-pressed", b.dataset.view===v));
+  try{ localStorage.setItem("pt-view", v); }catch{}
+  if(!$("#chat").hidden) openChat();
+}
+function disableAI(){ sample = null; $("#photoBtn").hidden = true; $("#fab").hidden = true; $("#chat").hidden = true; $("#shade").hidden = true; }
+
+// ===== example data so the page opens in a working state =====
+const EX_V = {year:2015, make:"Honda", model:"Accord", engine:"2.4L I4"};
+const EX_G = {title:"Front brake pads & rotors + brake fluid flush", summary:"Replace front pads and rotors on both sides, clean and lube the slide pins, then flush the brake fluid. A straightforward driveway job with jack stands.",
+  customer_explanation:"The grinding you hear usually means the brake pads are worn down to metal and are scraping the rotors. We'll replace the front pads and rotors and change the old brake fluid so your car stops smoothly and quietly again.",
+  customer_steps:["Inspect all four brakes and check the brake fluid","Replace the front brake pads and rotors","Flush in fresh brake fluid","Test drive to make sure everything stops right"],
+  safe_to_drive:"caution", safety_note:"Short trips are usually OK, but stopping distances get longer as the pads wear. Get it done within a few days.",
+  difficulty:"Easy", mobile_ok:true, mobile_note:"Needs level ground, wheel chocks and two jack stands. Bring an impact for the rotor retaining screws.",
+  services:[
+    {name:"Replace front brake pads & rotors", labor_hours_low:1.2, labor_hours_high:1.5, shop_labor_low:190, shop_labor_high:260,
+      parts:[{name:"Front brake pads (ceramic)",qty:1,unit:"set",spec:"With new abutment clips",oem_number:"",search:"front brake pads ceramic",price_low:45,price_high:85},
+             {name:"Front brake rotors",qty:2,unit:"each",spec:"Vented, match OE diameter",oem_number:"",search:"front brake rotor",price_low:90,price_high:170}]},
+    {name:"Brake fluid flush", labor_hours_low:0.6, labor_hours_high:0.8, shop_labor_low:90, shop_labor_high:140,
+      parts:[{name:"Brake fluid DOT 3",qty:2,unit:"bottle (32 oz)",spec:"Honda-approved DOT 3",oem_number:"",search:"DOT 3 brake fluid 32 oz",price_low:16,price_high:30}]}],
+  tools:["Floor jack & 2 jack stands","19 mm lug socket","17 mm & 12 mm sockets","#3 impact driver (rotor screws)","Caliper piston compressor","Torque wrench (ft-lb)","Brake bleeder bottle & 8 mm wrench"],
+  specs:[{name:"Lug nuts",value:"80 ft-lb"},{name:"Caliper bracket bolts",value:"80 ft-lb"},{name:"Caliper slide (guide) bolts",value:"17 ft-lb"},{name:"Brake fluid",value:"DOT 3"}],
+  steps:[{title:"Check fluid and safety",detail:"Note the brake fluid level and chock the rear wheels."},
+    {title:"Lift and support",detail:"Break lugs loose, jack at the front jack point and set stands under the pinch welds. Remove the wheels."},
+    {title:"Remove caliper",detail:"Remove the two 12 mm slide bolts and hang the caliper with wire. Do not let it hang on the hose."},
+    {title:"Remove bracket and rotor",detail:"Remove the two 17 mm bracket bolts and the two rotor retaining screws, then pull the rotor."},
+    {title:"Clean the hub",detail:"Wire-brush rust off the hub face so the new rotor sits flat. Clean the bracket abutments and slide pins."},
+    {title:"Install rotor, bracket and pads",detail:"Install the rotor and screws, then the bracket at spec. Fit new clips, lightly grease, and seat the pads."},
+    {title:"Refit caliper",detail:"Push the piston back slowly, refit the caliper and torque the slide bolts. Repeat on the other side."},
+    {title:"Flush the fluid",detail:"Bleed in order RR, LF, LR, RF until clean fluid runs from each bleeder. Keep the reservoir topped up."},
+    {title:"Pump and check",detail:"Reinstall wheels, torque lugs in a star pattern, pump the pedal until firm and top off fluid."},
+    {title:"Bed in",detail:"Do 8–10 moderate stops from 35 mph to 5 mph without fully stopping, then drive gently to cool."}],
+  warnings:["Never step on the brake pedal with a caliper off.","Rotor screws often seize; an impact driver beats stripping them.","Confirm pad fitment by VIN at the parts counter."],
+  related:["Rear brake inspection","Tire rotation"], confidence:"medium"};
+
+// ===== boot =====
+$("#makes").innerHTML = MAKES.map(m=>`<option value="${m}">`).join("");
+initCustomer(); initShop(); initChat();
+renderCustomer(EX_G, EX_V, true);
+renderShop(EX_G, EX_V, true);
+last.customer = null; last.shop = null;   // don't treat the example as chat context
+setView("customer");
+document.querySelectorAll("#viewswitch button").forEach(b=>b.onclick=()=>setView(b.dataset.view));
+
+(async()=>{
+  const c = window.claude;
+  const [s, u, d] = await Promise.all([c?.use("sample").catch(()=>null), c?.use("user").catch(()=>null), c?.use("downloads").catch(()=>null)]);
+  sample = s || null; downloads = d || null;
+  isStaff = u ? await u.canEdit().catch(()=>false) : false;
+  $("#viewswitch").hidden = false; // portfolio demo: both views visible
+  if(isStaff){
+    $("#viewswitch").hidden = false;
+    let saved = "shop"; try{ saved = localStorage.getItem("pt-view") || "shop"; }catch{}
+    setView(saved);
+  }
+  if(sample){
+    $("#fab").hidden = false;
+    const lim = await sample.limits().catch(()=>null);
+    $("#photoBtn").hidden = !lim?.images;
+  }
+})();
+</script>
+
+</body></html>

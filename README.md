@@ -26,14 +26,14 @@
 <td width="50%" valign="top">
 
 ### 🤖 Agents & workflows
-**4** production agents and pipelines
+**7** production agents and pipelines
 Scheduled, guardrailed, tool-using
 
 </td>
 <td width="50%" valign="top">
 
 ### 🌐 Live demos
-**5** pages running on GitHub Pages
+**7** pages running on GitHub Pages
 Click any **▶ Live** badge below to try one
 
 </td>
@@ -81,6 +81,37 @@ Reusable prompt system for realistic 15-second vertical commercials for local bu
 
 </td>
 </tr>
+<tr>
+<td width="50%" valign="top">
+
+### 🗂️ [AI Executive Assistant](agents/executive-assistant-briefs/)
+Two scheduled agents: a 7 AM one-screen brief from calendar, bookings and inbox, and a Sunday rollup that scores the week, pulls revenue and sets the top 3 priorities. Draft-only.
+
+<img src="https://img.shields.io/badge/Claude-scheduled-D97757" /> <img src="https://img.shields.io/badge/Gmail_·_Calendar-API-EA4335" /> <img src="https://img.shields.io/badge/Square_·_Stripe-read--only-555" />
+
+</td>
+<td width="50%" valign="top">
+
+### 🚗 [Appointment & Mileage Logger](agents/appointment-mileage-logger/)
+Weekly agent that matches calendar visits to QuickBooks invoices, computes round-trip mileage, and appends payroll-ready rows to Google Sheets. Append-only, flags gaps.
+
+<img src="https://img.shields.io/badge/QuickBooks-read--only-2CA01C" /> <img src="https://img.shields.io/badge/Google_Sheets-API-34A853" /> <img src="https://img.shields.io/badge/cron-weekly-555" />
+
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+
+### 🔁 [Self-Updating Portfolio Curator](agents/portfolio-curator/)
+Monthly agent that finds new work, sanitizes it against a confidentiality policy, and commits write-ups, demos and README cards to this repo in one atomic commit.
+
+<img src="https://img.shields.io/badge/GitHub-API-181717?logo=github" /> <img src="https://img.shields.io/badge/Claude-scheduled-D97757" /> <img src="https://img.shields.io/badge/cron-monthly-555" />
+
+</td>
+<td width="50%" valign="top">
+
+</td>
+</tr>
 </table>
 
 <details>
@@ -118,12 +149,30 @@ flowchart LR
 ```
 </details>
 
+<details>
+<summary><b>🔍 How the executive-assistant agents work</b> (click to expand)</summary>
+
+```mermaid
+flowchart LR
+    C[📅 Calendar] --> B[🤖 Morning brief]
+    K[🗓️ Bookings] --> B
+    G[📧 Gmail 24h] --> B
+    B --> P[📱 One-screen brief]
+    S[💳 Square + Stripe<br/>read-only] --> W[🤖 Sunday rollup]
+    B --> W
+    W --> H[Top 3 priorities for next week]
+```
+
+**Guardrails:** both agents are draft-only: they never send email, book, pay, sign or post.
+</details>
+
 ---
 
 ## 🛠️ Apps & tools
 
 | | Project | What it does | Try it |
 |:-:|---|---|:-:|
+| 🔧 | [**AI Mobile Mechanic Quote Tool**](apps/mobile-mechanic-quote/) | Customer quote + mechanic work order from one structured LLM call: VIN decode with check digit, clamped price ranges, repair procedure, editable invoice → PDF | [![Live](https://img.shields.io/badge/▶_Live-14B8A6?style=flat-square)](https://oxayavongsa.github.io/ai-automation-portfolio/apps/mobile-mechanic-quote/) |
 | 📵 | [**Junk Text Triage**](apps/junk-text-triage/) | Private, in-browser SMS-backup analyzer. Ranks junk senders and sorts them into scam, marketing, and OTP. Nothing is uploaded | [![Live](https://img.shields.io/badge/▶_Live-14B8A6?style=flat-square)](https://oxayavongsa.github.io/ai-automation-portfolio/apps/junk-text-triage/) |
 | ⚡ | [**Dev Cheatsheets**](apps/dev-cheatsheets/) | Side-by-side syntax for Python, JavaScript, SQL, Java, C++, and Bash | [![Live](https://img.shields.io/badge/▶_Live-14B8A6?style=flat-square)](https://oxayavongsa.github.io/ai-automation-portfolio/apps/dev-cheatsheets/) |
 
@@ -138,6 +187,7 @@ flowchart LR
 
 | | Project | Summary | Read it |
 |:-:|---|---|:-:|
+| 🥽 | [**THRESHOLD: Mixed Reality Game Design Doc**](product-specs/threshold-mr-game/) | Room-adaptive Quest 3 game: MRUK level generation, layered secrets, co-op via spatial anchors, consent-gated AI companions, monetization and gated roadmap | [![Spec](https://img.shields.io/badge/▶_Open_spec-B4541F?style=flat-square)](https://oxayavongsa.github.io/ai-automation-portfolio/product-specs/threshold-mr-game/) |
 | 🧾 | [**AI Receipt & Mileage App: PRD**](product-specs/expense-mileage-app/) | Pricing tiers, 7 industry templates, a dimension-based data model, AI OCR and categorization, phased build plan | [![Spec](https://img.shields.io/badge/▶_Open_spec-B4541F?style=flat-square)](https://oxayavongsa.github.io/ai-automation-portfolio/product-specs/expense-mileage-app/) |
 
 ## 🐍 More code
