@@ -1,0 +1,77 @@
+{
+  "_note": "Sanitized webhook tool definitions. Auth connection IDs, calendar IDs, Calendly user/event-type URIs and emails are placeholders.",
+  "tools": [
+    {
+      "name": "check_notary_availability",
+      "type": "webhook",
+      "method": "GET",
+      "url": "https://api.calendly.com/event_type_available_times",
+      "auth": { "type": "bearer_token", "auth_connection_id": "<CALENDLY_AUTH_CONNECTION>" },
+      "query_params": {
+        "event_type": "LLM: <OFFICE_EVENT_TYPE_URI> for office, <MOBILE_EVENT_TYPE_URI> for mobile",
+        "start_time": "LLM: UTC ISO 8601, must be in the future",
+        "end_time": "LLM: UTC ISO 8601, at most 7 days after start_time"
+      }
+    },
+    {
+      "name": "book_notary_appointment",
+      "type": "webhook",
+      "method": "POST",
+      "url": "https://api.calendly.com/invitees",
+      "auth": { "type": "bearer_token", "auth_connection_id": "<CALENDLY_AUTH_CONNECTION>" },
+      "body": {
+        "event_type": "LLM: same URI used for availability",
+        "start_time": "LLM: exact start_time returned by availability",
+        "invitee": { "name": "LLM", "email": "LLM (optional)", "timezone": "constant: America/Los_Angeles" },
+        "location": "LLM: physical office address, or ask_invitee with the client's address"
+      }
+    },
+    {
+      "name": "check_notary_booked",
+      "type": "webhook",
+      "method": "GET",
+      "url": "https://api.calendly.com/scheduled_events",
+      "auth": { "type": "bearer_token", "auth_connection_id": "<CALENDLY_AUTH_CONNECTION>" },
+      "query_params": {
+        "user": "constant: <CALENDLY_USER_URI>",
+        "status": "constant: active",
+        "min_start_time": "LLM: UTC, two hours before the window",
+        "max_start_time": "LLM: UTC, end of the window"
+      }
+    },
+    {
+      "name": "check_salon_busy",
+      "type": "webhook",
+      "method": "POST",
+      "url": "https://www.googleapis.com/calendar/v3/freeBusy",
+      "auth": {
+        "type": "oauth2_jwt",
+        "note": "Service account with domain-wide delegation; subject = business calendar owner",
+        "auth_connection_id": "<GOOGLE_AUTH_CONNECTION>"
+      },
+      "body": {
+        "timeMin": "LLM: RFC 3339 with -08:00 offset",
+        "timeMax": "LLM: RFC 3339 with -08:00 offset",
+        "items": [{ "id": "constant: <BUSINESS_CALENDAR_ID>" }]
+      }
+    },
+    {
+      "name": "book_salon_appointment",
+      "type": "webhook",
+      "method": "POST",
+      "url": "https://www.googleapis.com/calendar/v3/calendars/<BUSINESS_CALENDAR_ID>/events",
+      "auth": { "type": "oauth2_jwt", "auth_connection_id": "<GOOGLE_AUTH_CONNECTION>" },
+      "query_params": { "sendUpdates": "constant: all" },
+      "body": {
+        "summary": "LLM: 'Haircut – <client first name> (<n> people)'",
+        "location": "LLM: client address",
+        "description": "LLM: name, number, party size, notes. 'Booked by phone assistant. Subject to confirmation.'",
+        "start": { "dateTime": "LLM", "timeZone": "constant: America/Los_Angeles" },
+        "end": { "dateTime": "LLM: start + 75 min + 45 min per extra person", "timeZone": "constant: America/Los_Angeles" },
+        "attendees": "LLM: [{ email }] if the caller gave one"
+      }
+    }
+  ],
+  "built_in_tools": ["end_call"],
+  "post_call_webhook": "https://hook.<region>.make.com/<WEBHOOK_ID>"
+}

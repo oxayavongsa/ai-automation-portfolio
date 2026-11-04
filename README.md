@@ -26,7 +26,7 @@
 <td width="50%" valign="top">
 
 ### 🤖 Agents & workflows
-**7** production agents and pipelines
+**8** production agents and pipelines
 Scheduled, guardrailed, tool-using
 
 </td>
@@ -109,6 +109,11 @@ Monthly agent that finds new work, sanitizes it against a confidentiality policy
 
 </td>
 <td width="50%" valign="top">
+
+### 📞 [AI Voice Receptionist](agents/ai-voice-receptionist/)
+Live voice agent answering missed calls for two businesses on one line: quotes with travel estimates, books across Calendly + Google Calendar without double-booking, priority-routes signing companies, and acts as a private voicemail for personal callers.
+
+<img src="https://img.shields.io/badge/ElevenLabs-voice_agent-000" /> <img src="https://img.shields.io/badge/Twilio-voice-F22F46?logo=twilio&logoColor=white" /> <img src="https://img.shields.io/badge/Calendly_·_GCal-API-006BFF" />
 
 </td>
 </tr>
