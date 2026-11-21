@@ -225,7 +225,7 @@ Python agents that run my notary admin every morning (rotation tracking, ad-queu
 
 <div align="center">
 
-**Open to remote AI/ML, automation, and payroll-tech roles.**
+**Open to AI/ML and automation roles, partnerships, and investor conversations.** Founder of [Novard.ai](https://www.novard.ai) (Nova R&D Labs). Live products: [SwitchLingo](https://msthai-switchlingo.hf.space) · [WipeMyBills](https://wipemybills.pages.dev) · [Lazy Accounting](https://lazyaccounting.com) · [THRESHOLD](https://threshold-night-shift.pages.dev)
 
 <a href="https://github.com/oxayavongsa"><img src="https://img.shields.io/badge/GitHub-oxayavongsa-181717?style=for-the-badge&logo=github" /></a>
 <a href="https://www.novard.ai"><img src="https://img.shields.io/badge/Web-novard.ai-14B8A6?style=for-the-badge" /></a>
