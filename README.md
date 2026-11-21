@@ -187,6 +187,7 @@ flowchart LR
 |:-:|---|---|:-:|
 | 🖋️ | [**Mobile Notary Services & Pricing**](websites/) | Animated ticker, tiered service roadmap, intro-rate pricing, 5-step booking flow | [![Live](https://img.shields.io/badge/▶_Live-14B8A6?style=flat-square)](https://oxayavongsa.github.io/ai-automation-portfolio/websites/notary-landing-page/) |
 | ✅ | [**Notary Onboarding Guide**](websites/) | Interactive New vs. Renewing checklist with a resource hub | [![Live](https://img.shields.io/badge/▶_Live-14B8A6?style=flat-square)](https://oxayavongsa.github.io/ai-automation-portfolio/websites/notary-onboarding-guide/) |
+| 🥔 | [**Colossal Potato: Meal Prep Ordering Platform**](https://github.com/oxayavongsa/colossal-potato-bnx) | Full-stack ordering on Cloudflare Workers + D1: delivery windows with cutoffs and capacity caps, distance-based delivery fees, Stripe checkout, SMS updates, live driver tracking, an animated voice mascot with Web Audio lip-sync and cart-aware upsells, nutrition facts page, and local SEO schema | [![Live](https://img.shields.io/badge/▶_Live-14B8A6?style=flat-square)](https://colossalpotato.com) |
 
 ## 📐 Product design
 
