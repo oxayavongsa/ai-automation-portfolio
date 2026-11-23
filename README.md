@@ -188,6 +188,7 @@ flowchart LR
 | 🖋️ | [**Mobile Notary Services & Pricing**](websites/) | Animated ticker, tiered service roadmap, intro-rate pricing, 5-step booking flow | [![Live](https://img.shields.io/badge/▶_Live-14B8A6?style=flat-square)](https://oxayavongsa.github.io/ai-automation-portfolio/websites/notary-landing-page/) |
 | ✅ | [**Notary Onboarding Guide**](websites/) | Interactive New vs. Renewing checklist with a resource hub | [![Live](https://img.shields.io/badge/▶_Live-14B8A6?style=flat-square)](https://oxayavongsa.github.io/ai-automation-portfolio/websites/notary-onboarding-guide/) |
 | 🥔 | [**Colossal Potato: Meal Prep Ordering Platform**](https://github.com/oxayavongsa/colossal-potato-bnx) | Full-stack ordering on Cloudflare Workers + D1: delivery windows with cutoffs and capacity caps, distance-based delivery fees, Stripe checkout, SMS updates, live driver tracking, an animated voice mascot with Web Audio lip-sync and cart-aware upsells, nutrition facts page, and local SEO schema | [![Live](https://img.shields.io/badge/▶_Live-14B8A6?style=flat-square)](https://colossalpotato.com) |
+| 🎙️ | [**SwitchLingo: AI Video Translation**](https://github.com/oxayavongsa/switchlingo.ai) | Paste any video link, pick one of 108 languages: Whisper transcript, readable one-block view, subtitles and a voice-over that keeps the speaker's voice. Native speakers rate and fix lines, and agreed fixes retrain the AI (RLHF-style), starting with Lao, Isan and Hmong | [![Live](https://img.shields.io/badge/▶_Live-14B8A6?style=flat-square)](https://switchlingo.ai) |
 
 ## 📐 Product design
 
@@ -226,7 +227,7 @@ Python agents that run my notary admin every morning (rotation tracking, ad-queu
 
 <div align="center">
 
-**Open to AI/ML and automation roles, partnerships, and investor conversations.** Founder of [Novard.ai](https://www.novard.ai) (Nova R&D Labs). Live products: [SwitchLingo](https://msthai-switchlingo.hf.space) · [WipeMyBills](https://wipemybills.pages.dev) · [Lazy Accounting](https://lazyaccounting.com) · [THRESHOLD](https://threshold-night-shift.pages.dev)
+**Open to AI/ML and automation roles, partnerships, and investor conversations.** Founder of [Novard.ai](https://www.novard.ai) (Nova R&D Labs). Live products: [SwitchLingo](https://switchlingo.ai) · [WipeMyBills](https://wipemybills.pages.dev) · [Lazy Accounting](https://lazyaccounting.com) · [THRESHOLD](https://threshold-night-shift.pages.dev)
 
 <a href="https://github.com/oxayavongsa"><img src="https://img.shields.io/badge/GitHub-oxayavongsa-181717?style=for-the-badge&logo=github" /></a>
 <a href="https://www.novard.ai"><img src="https://img.shields.io/badge/Web-novard.ai-14B8A6?style=for-the-badge" /></a>
